@@ -1,11 +1,22 @@
+from typing import Optional
 from fasthtml.common import *
+import fasthtml.svg as svg
 
 
 class SearchInput:
-    def __init__(self, hx_post: str, hx_target: str, hx_swap: str):
+    def __init__(
+        self,
+        hx_post: str,
+        hx_target: str,
+        hx_swap: str,
+        id: Optional[str] = None,
+        hx_indicator: Optional[str] = None,
+    ):
         self.hx_post = hx_post
         self.hx_target = hx_target
         self.hx_swap = hx_swap
+        self.hx_indicator = hx_indicator
+        self.id = id
 
     def __ft__(self):
         return Form(
@@ -16,8 +27,8 @@ class SearchInput:
             ),
             Div(
                 Div(
-                    Svg(
-                        Path(
+                    svg.Svg(
+                        svg.Path(
                             stroke="currentColor",
                             stroke_linecap="round",
                             stroke_linejoin="round",
@@ -60,4 +71,6 @@ class SearchInput:
             hx_post=self.hx_post,
             hx_target=self.hx_target,
             hx_swap=self.hx_swap,
+            hx_indicator=self.hx_indicator,
+            id=self.id,
         )
