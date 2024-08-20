@@ -1,11 +1,13 @@
 import asyncio
+from asyncio.tasks import Task
 
 from fasthtml.common import *
 
 from starlette.responses import StreamingResponse
 from components.primitives.search_input import SearchInput
 from components.primitives.spinner import Spinner
-from data_types import JobOpening
+from components.primitives.success_icon import SuccessIcon
+from data_types import JobOpening, TaskStatus
 from components.timeline import Timeline, TimelineEvent
 from services.scraping_service import ScrapingService
 from test import Item
@@ -14,12 +16,16 @@ flowurl = "https://cdn.jsdelivr.net/npm/flowbite@2.4.1/dist"
 
 custom_script = Script(
     """
-    var form = document.getElementById('search_form');
+    // var form = document.getElementById('search_form');
 
     // Dispatch the custom event twice
-    form.dispatchEvent(new CustomEvent('customEvent'));
-    form.dispatchEvent(new CustomEvent('customEvent'));
+    // form.dispatchEvent(new CustomEvent('customEvent'));
+    // form.dispatchEvent(new CustomEvent('customEvent'));
 
+
+    document.body.addEventListener('htmx:configRequest', function(evt) {
+        evt.detail.headers['HX-Debug'] = '1';
+    });
     """
 )
 custom_styles = Style(
@@ -158,8 +164,6 @@ def get():
         hx_post="/action_plan",
         hx_target="#openings_results",
         hx_swap="innerHTML",
-        hx_trigger="htmx:afterOnLoad",
-        hx_post_2="htmx:afterOnLoad",
     )
 
     loader = Spinner(
@@ -182,7 +186,7 @@ def get():
                 page_title,
                 search_input,
                 results,
-                cls="container mx-auto, mt-10",
+                cls="container mx-auto, mt-10 flex flex-col items-center",
             ),
         ),
         Script(src=f"{flowurl}/flowbite.min.js"),
@@ -193,69 +197,85 @@ initial_action_plan = [
     TimelineEvent(
         id=1,
         title="Find page containing the list of openings at Company",
-        status="In Progress",
+        status=TaskStatus.IN_PROGRESS,
         task_type="Task",
+    ),
+]
+
+action_plan = [
+    TimelineEvent(
+        id=1,
+        title="Find page containing the list of openings at Company",
+        status=TaskStatus.COMPLETED,
+        task_type="Task",
+        hx_swap_oob="true",
     ),
     TimelineEvent(
         id=2,
         title="Parsing and filtering openings",
-        status="In Progress",
+        status=TaskStatus.IN_PROGRESS,
+        task_type="Task",
+        # hx_swap_oob="true",
+    ),
+    # TimelineEvent(
+    #     id=2,
+    #     title="(UPDATED) Parsing and filtering openings",
+    #     status=TaskStatus.COMPLETED,
+    #     task_type="Task",
+    #     hx_swap_oob="true",
+    # ),
+    TimelineEvent(
+        id=3,
+        title="Finding relevant contacts at Company",
+        status=TaskStatus.PENDING,
         task_type="Task",
     ),
     TimelineEvent(
         id=3,
         title="Finding relevant contacts at Company",
-        status="In Progress",
+        status=TaskStatus.COMPLETED,
+        task_type="Task",
+        hx_swap_oob="true",
+    ),
+    TimelineEvent(
+        id=4,
+        title="Find page containing the list of openings at Company",
+        status=TaskStatus.PENDING,
         task_type="Task",
     ),
     TimelineEvent(
-        id=1,
+        id=4,
         title="Find page containing the list of openings at Company",
-        status="Completed",
+        status=TaskStatus.COMPLETED,
         task_type="Task",
+        hx_swap_oob="true",
     ),
 ]
+
+
+async def timeline_event_generator():
+    print("HERE!")
+    await asyncio.sleep(1.5)
+    for action in action_plan[:3]:
+        yield to_xml(action)
+        await asyncio.sleep(1.5)
 
 
 @app.post("/action_plan")
 def fetch_action_plan():
     return Div(
-        Timeline(events=initial_action_plan, id="openings_results"),
+        Timeline(events=initial_action_plan, id="action_plan_timeline"),
         cls="container mx-10 mt-10 flex flex-col items-start gap-y-4",
     )
 
 
 @app.post("/stream_action_plan")
-def streaming_action_plan():
-    return "HEYLLO"
-
-
-@app.post("/stream_events")
-def stream_openings():
-    loader = Spinner(
-        id="loader",
-        cls="htmx-indicator transition-opacity duration-500 ease-in",
-    )
-
+async def streaming_action_plan():
     async def event_stream():
-        print("YIELDING ")
-        # yield to_xml(
-        #     Div(
-        #         H1("Action Plan", cls="text-2xl font-bold text-center mt-10"),
-        #         Timeline(events=[], id="openings_results_2"),
-        #         loader,
-        #         cls="container mx-10 mt-10 flex flex-col items-start gap-y-4",
-        #     )
-        # )
+        async for event in timeline_event_generator():
+            print("YIelding ", event)
+            yield event
 
-        for item in action_plan:
-            item_html = to_xml(item)
-            print("Sending item ", item_html)
-            await asyncio.sleep(2)
-            yield f"{item_html}"
-            # yield item
-            # await asyncio.sleep(2)
-
-    response = StreamingResponse(event_stream(), media_type="text/event-stream")
-    # response.headers["Transfer-Encoding"] = "chunked"
+    response = StreamingResponse(event_stream(), media_type="text/html")
+    response.headers["Transfer-Encoding"] = "chunked"
     return response

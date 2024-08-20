@@ -2,6 +2,8 @@ from typing import Optional
 from fasthtml.common import *
 import fasthtml.svg as svg
 
+from components.primitives.success_icon import SearchIcon
+
 
 class SearchInput:
     def __init__(
@@ -27,20 +29,7 @@ class SearchInput:
             ),
             Div(
                 Div(
-                    svg.Svg(
-                        svg.Path(
-                            stroke="currentColor",
-                            stroke_linecap="round",
-                            stroke_linejoin="round",
-                            stroke_width="2",
-                            d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z",
-                        ),
-                        aria_hidden="true",
-                        xmlns="http://www.w3.org/2000/svg",
-                        fill="none",
-                        viewbox="0 0 20 20",
-                        cls="w-4 h-4 text-gray-500 dark:text-gray-400",
-                    ),
+                    SearchIcon(),
                     cls="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none",
                 ),
                 Input(
@@ -73,4 +62,5 @@ class SearchInput:
             hx_swap=self.hx_swap,
             hx_indicator=self.hx_indicator,
             id=self.id,
+            **{"hx-on:htmx:after-request": "console.log('works.........')"},
         )

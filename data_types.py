@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Optional
 from fasthtml.common import A, P, Li, Div
 from dataclasses import dataclass
@@ -18,3 +19,10 @@ class JobOpening:
             id=f"item-{self.id}",
             sse_swap=f"sse-item-{self.id}",
         )
+
+
+class TaskStatus(Enum):
+    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
