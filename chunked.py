@@ -3,6 +3,8 @@ import asyncio
 from fasthtml.common import *
 from starlette.responses import StreamingResponse
 
+from services.scraping_service import ScrapingService
+
 htmxlink = Script(
     src="https://unpkg.com/htmx-ext-transfer-encoding-chunked@0.2.0/transfer-encoding-chunked.js"
 )
@@ -33,7 +35,14 @@ items = [
 ]
 
 
+scraping_service = ScrapingService()
+
+
 async def message_generator():
+    print("Fetching source")
+    source = scraping_service.get_page_source("https://www.anduril.com/careers")
+    print("GOT SOURECE: ", len(source))
+
     for item in items:
         yield to_xml(item)
         await asyncio.sleep(0.5)

@@ -15,10 +15,10 @@ from selenium.webdriver.common.by import By
 
 from data_types import JobOpening
 
-PARSE_HTML_SYSTEM_PROMPT = """Your job is to simply return structured data as requested. You parse the full document and return all the results. Provide only the answer, with no additional text or explanation. Do not answer with I Understand or similiar"""
+PARSE_HTML_SYSTEM_PROMPT = """Your job is to parse html and return structured data as requested. You parse the full document and return all the results. Provide only the answer, with no additional text or explanation."""
 PARSE_OPENINGS_LINK_PROMPT = """
-This is a JSON list of links parsed from the html content of the {} careers page. This list contains either a list of job openings, or a link to the list of openings/roles/positions/jobs. If the list contains a list of opens or jobs or positions, return None. Otherwise, 
-return the link to the open positions/roles/openings. Do not acknowledge this request, do not return JSON, simply return only either the link or None, with no additional text or explanation: \n\n {}
+This is the list of links tags (containing the content and href) parsed from the html content of the {} careers page. This list contains either a list of job openings, or a link to the list of openings/roles/positions/jobs. Return the link to the page containing openings/roles/positions/jobs. If the current page contains the list then simply return the current link.
+Dp not acknowledge this request, simply return only the link, with no additional text or explanation.
 """
 PARSE_OPENINGS_PROMPT = """
 This is the html content of the {} careers page containing a list of list of openings/roles/positions/jobs, each with a link. Parse the page and return a list of openings with the title of the opening, the link to the specific job page, and the location (if available). Also return a boolean field called related.
@@ -70,8 +70,7 @@ class ScrapingService:
         soup = BeautifulSoup(raw_html, "html.parser")
         a_tags = soup.find_all("a")
         return [
-            {"title": a_tag.get_text().replace("\n", " "), "href": a_tag.get("href")}
-            for a_tag in a_tags
+            {"text": a_tag.get_text(), "link": a_tag.get("href")} for a_tag in a_tags
         ]
 
     @staticmethod
@@ -136,10 +135,7 @@ class ScrapingService:
     ) -> List[JobOpening]:
         print(f"Parsing {job_type} openings for {company} from {openings_link}.")
         openings_page_source = self.get_page_source(openings_link)
-        cleaned_html = str(ScrapingService.strip_html(openings_page_source))
-        print(
-            f"Reduce the HTML context payload from {len(openings_page_source)} --> {len(cleaned_html)}"
-        )
+        cleaned_html = str(self.strip_html(openings_page_source))
 
         parse_opening_prompt = PARSE_OPENINGS_PROMPT.format(company, job_type)
         prompt = f"{cleaned_html}\n\n {parse_opening_prompt}"
@@ -161,11 +157,11 @@ class ScrapingService:
 
     def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
         print(f"Parsing openings page link from {link} for {company}")
-        raw_html = ScrapingService.get_page_source(link)
+        raw_html = self.get_page_source(link)
+        print("We fetched the page source!!!!")
         links = self.fetch_all_links_from_webpage(raw_html)
-        print("LInks: ", links)
-        prompt = PARSE_OPENINGS_LINK_PROMPT.format(company, links)
-        print(prompt)
+        link_prompt = PARSE_OPENINGS_LINK_PROMPT.format(company)
+        prompt = f"{links}\n\n {link_prompt}"
         openings_link = self.create_message(
             PARSE_HTML_SYSTEM_PROMPT,
             prompt,
@@ -175,8 +171,4 @@ class ScrapingService:
         )
         print("Resolved openings link: ", openings_link)
 
-        return (
-            ScrapingService.resolve_url(link, openings_link)
-            if openings_link and openings_link.lower() != "none"
-            else None
-        )
+        return ScrapingService.resolve_url(link, openings_link)

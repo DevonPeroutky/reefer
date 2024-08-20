@@ -56,7 +56,7 @@ class SearchInput:
                 ),
                 cls="w-[750px] relative",
             ),
-            cls="container mx-auto flex justify-center mt-10",
+            cls="container mx-auto flex justify-center py-10",
             hx_post=self.hx_post,
             hx_target=self.hx_target,
             hx_swap=self.hx_swap,

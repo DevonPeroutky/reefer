@@ -1,11 +1,14 @@
-from fasthtml.common import List
+import os
 import requests
 import json
 
+from fasthtml.common import List
+
 
 class SerpService:
-    def __init__(self, api_key: str):
-        self.api_key = api_key
+    def __init__(self):
+        self.api_key = os.getenv("SERPDOG_API_KEY")
+        assert self.api_key, "SERPDOG_API_KEY environment variable is not set."
 
     def _search(self, query: str):
         payload = {"api_key": self.api_key, "q": query, "gl": "us"}
@@ -14,7 +17,7 @@ class SerpService:
             raise Exception("Failed to fetch search results. Error: ", resp.status_code)
         return resp.text
 
-    def find_careers_url(self, company: str, job_type: str) -> str:
+    def find_careers_url(self, company: str) -> str:
         query = "{} careers".format(company)
         res = self._search(query)
         results = json.loads(res)["organic_results"]
