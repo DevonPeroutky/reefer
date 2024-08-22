@@ -1,10 +1,10 @@
-from itertools import groupby
+from itertools import groupby as itertools_groupby
 from uuid import uuid3
 import fasthtml.svg as svg
 
 from uuid import uuid4
 from typing import List, Optional
-from fasthtml.common import A, L, P, Li, Link, Ul
+from fasthtml.common import *
 from dataclasses import dataclass
 from fasthtml.common import Div, Span, Li, H3, P, to_xml
 
@@ -31,13 +31,24 @@ class JobOpening:
         location = P(
             " (" + self.location + ")" if self.location else "",
         )
-        return Li(
-            A(
-                self.title,
-                href=self.link,
-                target="_blank",
-                cls="font-medium text-sky-500 dark:text-sky-500 hover:underline",
+        return Div(
+            Input(
+                id="default-checkbox",
+                type="checkbox",
+                value="",
+                cls="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
             ),
+            Label(
+                A(
+                    self.title,
+                    href=self.link,
+                    target="_blank",
+                    cls="font-medium text-sky-500 dark:text-sky-500 hover:underline",
+                ),
+                fr="default-checkbox",
+                cls="ms-2 font-medium text-gray-900 dark:text-gray-300",
+            ),
+            cls="flex items-center mb-2",
             id=f"item-{self.id}",
         )
 
@@ -245,7 +256,7 @@ class ParseOpeningsTask(ActionEvent):
         sorted_by_location = sorted(
             self.job_openings or [], key=lambda x: x.location or "Unknown", reverse=True
         )
-        grouped_by_location = groupby(
+        grouped_by_location = itertools_groupby(
             sorted_by_location,
             lambda x: x.location or "Unknown",
         )
@@ -257,23 +268,23 @@ class ParseOpeningsTask(ActionEvent):
             )
             for location, openings in grouped_by_location
         ]
-        print(openings_by_locations)
 
         return (
             Div(
                 f"Found {self.job_type} jobs in the following locations... ",
                 Div(*openings_by_locations),
-                Ul(*self.job_openings, cls="list-disc list-inside"),
+                # Ul(*self.job_openings, cls="list-disc list-inside"),
             )
             if self.job_openings
             else None
         )
 
 
-class FindContatctsTask(ActionEvent):
+class FindContactsTask(ActionEvent):
     def __init__(
         self,
         company: str,
+        key_words: str,
         **kwargs,
     ):
         super().__init__(
