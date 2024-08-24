@@ -49,3 +49,8 @@ class Agent:
                 )
                 task.complete_task(openings=openings)
                 return openings
+            case TaskType.FIND_CONTACTS:
+                task = cast(ParseOpeningsTask, task)
+                assert task and task.job_openings, "Openings link not found"
+
+                return None

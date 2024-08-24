@@ -1,6 +1,6 @@
+import fasthtml.svg as svg
 from itertools import groupby as itertools_groupby
 from uuid import uuid3
-import fasthtml.svg as svg
 
 from uuid import uuid4
 from typing import List, Optional
@@ -35,7 +35,8 @@ class JobOpening:
             Input(
                 id="default-checkbox",
                 type="checkbox",
-                value="",
+                name="jobs",
+                value=f"item-{self.id}",
                 cls="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
             ),
             Label(
@@ -272,8 +273,33 @@ class ParseOpeningsTask(ActionEvent):
         return (
             Div(
                 f"Found {self.job_type} jobs in the following locations... ",
-                Div(*openings_by_locations),
-                # Ul(*self.job_openings, cls="list-disc list-inside"),
+                Form(
+                    Div(*openings_by_locations),
+                    Div(
+                        Button(
+                            "Find Contacts",
+                            svg.Svg(
+                                svg.Path(
+                                    stroke="currentColor",
+                                    stroke_linecap="round",
+                                    stroke_linejoin="round",
+                                    stroke_width="2",
+                                    d="M1 5h12m0 0L9 1m4 4L9 9",
+                                ),
+                                aria_hidden="true",
+                                xmlns="http://www.w3.org/2000/svg",
+                                fill="none",
+                                viewbox="0 0 14 10",
+                                cls="rtl:rotate-180 w-3.5 h-3.5 ms-2",
+                            ),
+                            type="submit",
+                            cls="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800",
+                        ),
+                        cls="flex font-medium gap-x-2 mt-8",
+                    ),
+                    hx_post="/find_contacts",
+                    hx_swap="afterend",
+                ),
             )
             if self.job_openings
             else None
@@ -284,7 +310,7 @@ class FindContactsTask(ActionEvent):
     def __init__(
         self,
         company: str,
-        key_words: str,
+        job_ids: str,
         **kwargs,
     ):
         super().__init__(
@@ -293,3 +319,4 @@ class FindContactsTask(ActionEvent):
             company=company,
             **kwargs,
         )
+        self.job_ids = job_ids

@@ -6,6 +6,7 @@ from starlette.responses import StreamingResponse
 from components.primitives.search_input import SearchInput
 from data_types import (
     FindCareersPageTask,
+    FindContactsTask,
     FindOpeningsPageTask,
     JobOpening,
     ParseOpeningsTask,
@@ -78,7 +79,7 @@ test_openings = [
         related=True,
     ),
     JobOpening(
-        id="0",
+        id="17",
         title="(NEW) Compliance Manager",
         location="New York, NY",
         link="https://www.brex.com/careers#Compliance-heading",
@@ -281,6 +282,11 @@ def fetch_action_plan(company: str):
     #     Timeline(events=test_actions, id="action_plan_timeline", company=company),
     #     cls="container mx-10 mt-10 flex flex-col items-start gap-y-4",
     # )
+
+
+@app.post("/find_contacts")
+def find_contacts(jobs: List[str]):
+    return Div("OK")
 
 
 @app.post("/stream_action_plan")
