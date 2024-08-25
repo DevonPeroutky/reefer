@@ -13,3 +13,4 @@ class TaskType(Enum):
     FIND_OPENINGS_PAGE = "find_openings_page"
     PARSE_OPENINGS = "parse_openings"
     FIND_CONTACTS = "find_contacts"
+    PARSE_JOB_DESCRIPTION = "parse_job_description"

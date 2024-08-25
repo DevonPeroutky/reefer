@@ -4,6 +4,8 @@ import json
 
 from fasthtml.common import List
 
+from data_types import Contact
+
 
 class SerpService:
     def __init__(self):
@@ -24,3 +26,25 @@ class SerpService:
         # print("Search Results: ", results)
 
         return results[0]["link"]
+
+    def find_list_of_contacts(
+        self, company: str, keywords: List[str], targetted_role: List[str]
+    ) -> List[Contact]:
+        return [
+            Contact(
+                name="John Doe",
+                job_title="Software Engineer",
+                location="San Francisco",
+                email="",
+            ),
+            Contact(
+                name="Jane Smith",
+                job_title="Engineering Manager",
+                location="San Francisco",
+                email="",
+            ),
+        ]
+        query = "{} careers".format(company)
+        res = self._search(query)
+        results = json.loads(res)["organic_results"]
+        # print("Search Results: ", results)

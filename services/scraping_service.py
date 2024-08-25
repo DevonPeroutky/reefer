@@ -2,7 +2,7 @@ import json
 import os
 import undetected_chromedriver as uc
 
-from typing import List, Optional
+from typing import Dict, List, Optional
 from anthropic import Anthropic
 from bs4 import BeautifulSoup, Comment
 from urllib.parse import urlparse, urljoin
@@ -13,7 +13,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
-from data_types import JobOpening
+from data_types import JobOpening, Company
 
 PARSE_HTML_SYSTEM_PROMPT = """Your job is to simply return structured data as requested. You parse the full document and return all the results. Provide only the answer, with no additional text or explanation. Do not answer with I Understand or similiar"""
 PARSE_OPENINGS_LINK_PROMPT = """
@@ -24,6 +24,16 @@ PARSE_OPENINGS_PROMPT = """
 This is the html content of the {} careers page containing a list of list of openings/roles/positions/jobs, each with a link. Parse the page and return a list of openings with the title of the opening, the link to the specific job page, and the location (if available). Also return a boolean field called related.
 Related should return 'True' if the the specific job is related to the criteria {} and 'False' if unrelated. Return the results as a list of json with the keys "title", "link", "location", and "related".
 Provide only the JSON, with no additional text or explanation.
+"""
+PARSE_QUERY_TERMS_PROMPT = """
+This is the html content of the {} job page at {}. I'm trying to find the most relevant hiring manager or employee at {} to reach out to for a referral. 
+
+Parse the page and return two lists:
+
+- The list of keywords or terms that are most relevant to the job description. 
+- The list of potential relevant positions involved for hiring for this role. (Ex. if the job is for a "Software Engineer", the list could contain "Engineering Manager", "Software Engineering", "Technical Lead" )
+
+The two list should be returned as a JSON with the keys "keywords" and "positions". Provide only the JSON, with no additional text or explanation.
 """
 
 
@@ -130,18 +140,19 @@ class ScrapingService:
 
     def parse_openings_from_link(
         self,
-        company: str,
         job_type: str,
-        openings_link: str,
+        company: Company,
     ) -> List[JobOpening]:
-        print(f"Parsing {job_type} openings for {company} from {openings_link}.")
-        openings_page_source = self.get_page_source(openings_link)
+        print(
+            f"Parsing {job_type} openings for {company.name} from {company.opening_link}."
+        )
+        openings_page_source = self.get_page_source(company.opening_link)
         cleaned_html = str(ScrapingService.strip_html(openings_page_source))
         print(
             f"Reduce the HTML context payload from {len(openings_page_source)} --> {len(cleaned_html)}"
         )
 
-        parse_opening_prompt = PARSE_OPENINGS_PROMPT.format(company, job_type)
+        parse_opening_prompt = PARSE_OPENINGS_PROMPT.format(company.name, job_type)
         prompt = f"{cleaned_html}\n\n {parse_opening_prompt}"
         text_responses = self.create_message(
             PARSE_HTML_SYSTEM_PROMPT,
@@ -154,7 +165,7 @@ class ScrapingService:
         json_response = json.loads(text_responses)
         print(json_response)
         job_openings = [
-            JobOpening(id=str(idx), **json_object)
+            JobOpening(id=str(idx), company=company, **json_object)
             for idx, json_object in enumerate(json_response)
         ]
         return job_openings
@@ -180,3 +191,34 @@ class ScrapingService:
             if openings_link and openings_link.lower() != "none"
             else None
         )
+
+    def find_query_terms_from_job_description(
+        self, job_opening: JobOpening
+    ) -> Dict[str, List[str]]:
+        return {
+            "keywords": ["Python", "Django", "React", "GraphQL"],
+            "positions": [
+                "Engineering Manager",
+                "Software Engineering",
+                "Technical Lead",
+            ],
+        }
+
+        raw_html = ScrapingService.get_page_source(job_opening.link)
+        cleaned_html = str(ScrapingService.strip_html(raw_html))
+
+        parse_query_terms_prompt = PARSE_QUERY_TERMS_PROMPT.format(
+            job_opening.title, job_opening.company, job_opening.company
+        )
+        prompt = f"{cleaned_html}\n\n {parse_query_terms_prompt}"
+        text_responses = self.create_message(
+            PARSE_HTML_SYSTEM_PROMPT,
+            prompt,
+            model="claude-3-5-sonnet-20240620",
+            temperature=0.1,
+            max_tokens=4096,
+        )
+        print(text_responses)
+        json_response = json.loads(text_responses)
+        print(json_response)
+        return json_response
