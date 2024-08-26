@@ -4,17 +4,14 @@ from fasthtml.common import *
 
 from starlette.responses import StreamingResponse
 from components.primitives.search_input import SearchInput
-from actions.events import (
-    FindCareersPageTask,
-    FindOpeningsPageTask,
-    ParseOpeningsTask,
-)
 from components.application.contact_table import ContactTable
 from components.application.timeline import Timeline
 from custom_hdrs import CUSTOM_HDRS, FLOWBITE_INCLUDE_SCRIPT
 from services.action_planner import Agent
 
 app = FastHTML(hdrs=CUSTOM_HDRS, live=True)
+
+agent = Agent()
 
 
 @app.route("/")
@@ -26,8 +23,10 @@ def get():
         hx_target="#openings_results",
         hx_swap="innerHTML",
     )
-    results = Div(id="openings_results")
-    test_results_table = Ol(id="test_results_table")
+    results = Div(
+        id="openings_results",
+        cls="mx-auto w-full max-w-[1024px] flex flex-col items-start w-[1024px]",
+    )
 
     return (
         Title("Reefer"),
@@ -35,13 +34,7 @@ def get():
             Div(
                 page_title,
                 search_input,
-                Div(
-                    # TEST_ACTION_PLAN,
-                    results,
-                    test_results_table,
-                    cls="mx-auto w-full max-w-[1024px] flex flex-col items-start w-[1024px]",
-                ),
-                cls="mx-auto py-10 flex flex-col items-center w-full",
+                results,
             ),
             cls="flex justify-center",
         ),
@@ -49,30 +42,33 @@ def get():
     )
 
 
-agent = Agent()
-
-
 @app.post("/action_plan")
 def fetch_action_plan(company_name: str):
-    return Div(
-        Timeline(events=[], id="action_plan_timeline", company_name=company_name),
-        cls="container mx-10 mt-10 flex flex-col items-start gap-y-4",
-    )
+    return Timeline(events=[], id="action_plan_timeline", company_name=company_name)
 
 
-@app.post("/find_contacts")
-async def find_contacts(request: Request, company: str):
+@app.post("/contacts_table")
+async def render_contact_table(request: Request, company_name: str):
     # TODO: Don't do it this way
     form = await request.form()
     print("Form: ", form)
-    jobs = cast(List[str], form.getlist("jobs[]"))
-    print("JOBS: ", jobs)
+    job_ids = cast(List[str], form.getlist("jobs[]"))
+    print("JOBS IDs: ", job_ids)
 
-    async def event_stream():
-        for job in jobs:
-            yield to_xml(Div("hi"))
+    response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
+    response.headers["Transfer-Encoding"] = "chunked"
+    return response
 
-    response = StreamingResponse(event_stream(), media_type="text/html")
+
+@app.post("/stream_contacts")
+async def stream_contacts(request: Request):
+    # TODO: Don't do it this way
+    form = await request.form()
+    print("Form: ", form)
+    job_ids = cast(List[str], form.getlist("jobs[]"))
+    print("JOBS IDs: ", job_ids)
+
+    response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
     response.headers["Transfer-Encoding"] = "chunked"
     return response
 
@@ -82,7 +78,7 @@ async def streaming_action_plan(
     company_name: str,
 ):
     response = StreamingResponse(
-        agent.test_timeline_event_generator(company_name), media_type="text/html"
+        agent.find_company_information(company_name), media_type="text/html"
     )
     response.headers["Transfer-Encoding"] = "chunked"
     return response

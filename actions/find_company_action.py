@@ -4,10 +4,12 @@ from typing import List, Optional, TypeVar, Generic, AsyncGenerator
 from fasthtml.common import Safe, to_xml
 
 from actions.events import (
+    ContactTableEvent,
     FindCareersPageTask,
     FindOpeningsPageTask,
     BaseAction,
 )
+from components.application.contact_table import ContactTable
 from services.serp_service import SerpService
 from services.scraping_service import ScrapingService
 from data_types import Company, Contact, JobOpening
@@ -25,6 +27,7 @@ class FindCompanyAction(BaseAction[Company]):
         self.status = TaskStatus.IN_PROGRESS
         self.openings_link = None
         self.careers_link = None
+        self.company: Optional[Company] = None
 
     async def yield_action_stream(
         self, company_name: str
@@ -33,7 +36,7 @@ class FindCompanyAction(BaseAction[Company]):
 
         event = FindCareersPageTask(company_name=company_name)
         yield to_xml(event)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
 
         # careers_page_url = self.serp_service.find_careers_url(event.company_name)
         careers_page_url = "https://www.brex.com/careers"
@@ -41,7 +44,7 @@ class FindCompanyAction(BaseAction[Company]):
         event.complete_task(link=careers_page_url)
 
         yield to_xml(event)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
 
         # -----------------------
         # TASK: FIND OPENINGS PAGE
@@ -50,7 +53,7 @@ class FindCompanyAction(BaseAction[Company]):
             careers_link=str(careers_page_url), company_name=company_name
         )
         yield to_xml(find_openings_page_event)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
 
         # openings_page_url = (
         #     self.scraping_service.find_openings_page_link(
@@ -60,16 +63,15 @@ class FindCompanyAction(BaseAction[Company]):
         # )
         openings_page_url = "https://www.brex.com/careers#jobsBoard"
 
-        # Store the found informatino
-        self.openings_link = openings_page_url
+        # Store the found information
         self.careers_link = careers_page_url
+        self.openings_link = openings_page_url
 
         find_openings_page_event.complete_task(openings_link=openings_page_url)
 
         yield to_xml(find_openings_page_event)
-        await asyncio.sleep(0.01)
 
-    def yield_action_result(self):
+    def yield_action_result(self) -> Company:
         return Company(
             name=self.company_name,
             careers_link=self.careers_link,

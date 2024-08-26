@@ -1,10 +1,11 @@
 import os
+import time
 import requests
 import json
 
 from fasthtml.common import List
 
-from data_types import Contact
+from data_types import Company, Contact
 
 
 class SerpService:
@@ -28,20 +29,25 @@ class SerpService:
         return results[0]["link"]
 
     def find_list_of_contacts(
-        self, company: str, keywords: List[str], targetted_role: List[str]
+        self, company: Company, keywords: List[str], targetted_role: List[str]
     ) -> List[Contact]:
+
+        time.sleep(1)
+
         return [
             Contact(
-                name="John Doe",
+                name="Pedro Franceschi",
                 job_title="Software Engineer",
                 location="San Francisco",
-                email="",
+                email="john@brex.com",
+                company=company,
             ),
             Contact(
                 name="Jane Smith",
                 job_title="Engineering Manager",
                 location="San Francisco",
                 email="",
+                company=company,
             ),
         ]
         query = "{} careers".format(company)

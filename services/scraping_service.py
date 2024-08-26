@@ -1,5 +1,6 @@
 import json
 import os
+from fasthtml.common import dataclass
 import undetected_chromedriver as uc
 
 from typing import Dict, List, Optional

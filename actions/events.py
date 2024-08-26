@@ -3,7 +3,7 @@ import fasthtml.svg as svg
 from itertools import groupby as itertools_groupby
 
 from uuid import uuid4
-from typing import List, Optional, TypeVar, Generic, AsyncGenerator
+from typing import List, Optional, TypeVar, Generic, AsyncGenerator, Tuple
 from fasthtml.common import *
 
 from components.application.timeline_status_indicator import (
@@ -14,6 +14,8 @@ from components.primitives.tag import (
     CompanyTag,
     JobTypeTag,
     OutputInputTag,
+    PositionTag,
+    KeywordTag,
 )
 from data_types import Company, Contact, JobOpening
 from enums import TaskStatus, TaskType
@@ -25,7 +27,7 @@ T = TypeVar("T")
 
 class BaseAction(ABC, Generic[T]):
     @abstractmethod
-    async def yield_action_stream(self, **kwargs) -> AsyncGenerator[Safe, None]:
+    async def yield_action_stream(self, *args, **kwargs) -> AsyncGenerator[Safe, None]:
         pass
 
     @abstractmethod
@@ -51,7 +53,7 @@ class ActionEvent:
     def _prepare_for_dom_update(self):
         self.kwargs["hx_swap_oob"] = "true"
 
-    def complete_task(self):
+    def complete_task(self, *args, **kwargs):
         self.status = TaskStatus.COMPLETED
         self._prepare_for_dom_update()
 
@@ -166,7 +168,7 @@ class FindOpeningsPageTask(ActionEvent):
                 )
             ),
             "to find the page containing the list of openings at",
-            CompanyTag(self.company_name),
+            CompanyTag(self.company_name.title()),
             cls=title_cls,
         )
 
@@ -230,7 +232,7 @@ class ParseOpeningsTask(ActionEvent):
             Span("for"),
             JobTypeTag(self.job_type),
             "openings at",
-            CompanyTag(self.company.name),
+            CompanyTag(self.company.name.title()),
             cls=title_cls,
         )
 
@@ -278,7 +280,7 @@ class ParseOpeningsTask(ActionEvent):
                         ),
                         cls="flex font-medium gap-x-2 mt-8",
                     ),
-                    hx_post=f"/find_contacts?company={self.company}",
+                    hx_post=f"/contacts_table?company_name={self.company.name}",
                     hx_target="#action_plan_timeline",
                     hx_swap="beforeend",
                     hx_ext="chunked-transfer",
@@ -286,4 +288,90 @@ class ParseOpeningsTask(ActionEvent):
             )
             if self.job_openings
             else None
+        )
+
+
+class ParseJobDescriptionEvent(ActionEvent):
+    def __init__(
+        self,
+        job: JobOpening,
+        **kwargs,
+    ):
+        super().__init__(
+            status=TaskStatus.IN_PROGRESS,
+            task_type=TaskType.PARSE_JOB_DESCRIPTION,
+            company_name=job.company.name.title(),
+            **kwargs,
+        )
+        self.job = job
+        self.keywords = []
+        self.positions = []
+
+    def complete_task(self, keywords: List[str], positions: List[str]):
+        super().complete_task()
+        self.keywords = keywords
+        self.positions = positions
+
+    def _render_title(self):
+        title_cls = "flex gap-x-2 font-medium leading-tight"
+        if self.status == TaskStatus.IN_PROGRESS:
+            title_cls += " italic"
+
+        return Span(
+            H3("Parsing job description for"),
+            JobTypeTag(self.job.title),
+            H3("at"),
+            CompanyTag(self.job.company.name),
+            cls=title_cls,
+        )
+
+    def _render_details(self):
+        return (
+            Span(
+                H3("Determined keywords ", cls="whitespace-nowrap"),
+                *[KeywordTag(keyword) for keyword in self.keywords],
+                H3("and roles", cls="whitespace-nowrap"),
+                *[PositionTag(position) for position in self.positions],
+                H3(
+                    " as good indicators for finding contacts.",
+                    cls="whitespace-nowrap",
+                ),
+                cls="text-sm flex gap-x-2 font-medium leading-relaxed max-w-full flex-wrap",
+            )
+            if self.keywords or self.positions
+            else None
+        )
+
+
+class ContactTableEvent:
+    def __init__(
+        self,
+        company: Company,
+        job_contacts: List[Tuple[JobOpening, Contact]],
+        hidden: bool = False,
+        **kwargs,
+    ):
+        self.company = company
+        self.status = TaskStatus.IN_PROGRESS
+        self.hidden = hidden
+        self.id = "contact-table"
+        self.kwargs = kwargs
+        self.job_contacts = job_contacts
+
+    def complete_task(self, job_contacts: List[Tuple[JobOpening, Contact]]):
+        self.status = TaskStatus.COMPLETED
+        self.job_contacts = job_contacts
+
+    def __ft__(self):
+        print("RENDERING CONTACT TABLE: ", self.job_contacts)
+        return Li(
+            TimelineEventStatusIndicator(self.status, self.id),
+            Div(
+                ContactTable(company=self.company, job_contacts=self.job_contacts),
+                cls="w-full py-4 px-6 flex flex-col gap-y-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600",
+            ),
+            cls=f"ms-6 flex items-start flex-col pl-2 {'hidden' if self.hidden else ''}",
+            id=f"item-{self.id}",
+            **self.kwargs,
+            **{"hx_swap_oob": "true"} if self.status == TaskStatus.COMPLETED else {},
         )

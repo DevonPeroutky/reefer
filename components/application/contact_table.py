@@ -1,39 +1,56 @@
 from fasthtml.common import *
+from typing import List, Tuple
 
-from data_types import Contact
+from components.primitives.tag import CompanyTag
+from data_types import Company, Contact, JobOpening
 
 
-class ContactTable:
-    def __init__(self, company: str, contacts: List[Contact], *args, **kwargs):
-        self.args = args
-        self.kwargs = kwargs
-        self.company = company
-        self.contacts = contacts
+class ContactRow:
+    def __init__(self, job_opening: JobOpening, contact: Contact):
+        self.contact = contact
+        self.job_opening = job_opening
 
-    def add_contact(self, contact: Contact):
-        self.contacts.append(contact)
-
-    def _render_contact_row(self, contact: Contact):
+    def __ft__(self):
+        print("RENDERING CONTACT ROW: ", self.contact.name, " - ", self.contact.id)
         return Tr(
+            Td(self.job_opening.title, cls="px-6 py-4"),
             Th(
-                contact.name,
+                self.contact.name,
                 scope="row",
                 cls="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white",
             ),
-            Td(contact.job_title, cls="px-6 py-4"),
-            Td(contact.location, cls="px-6 py-4"),
-            Td(contact.email, cls="px-6 py-4"),
+            Td(self.contact.job_title, cls="px-6 py-4"),
+            Td(self.contact.notes, cls="px-6 py-4"),
+            Td(self.contact.email, cls="px-6 py-4"),
+            id=self.contact.id,
         )
 
+
+class ContactTable:
+    def __init__(
+        self,
+        company: Company,
+        job_contacts: List[Tuple[JobOpening, Contact]],
+        *args,
+        **kwargs
+    ):
+        self.args = args
+        self.kwargs = kwargs
+        self.company = company
+        self.job_contacts = job_contacts
+
     def __ft__(self):
-        return Div(
+        return (
+            Div(
+                "Potential",
+                CompanyTag(self.company.name),
+                "Contacts",
+                cls="flex gap-x-2 py-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800",
+            ),
             Table(
-                Caption(
-                    f"{self.company} Contacts",
-                    cls="p-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800",
-                ),
                 Thead(
                     Tr(
+                        Th("Job Opening", scope="col", cls="px-6 py-3"),
                         Th("Name", scope="col", cls="px-6 py-3"),
                         Th("Title", scope="col", cls="px-6 py-3"),
                         Th("Notes", scope="col", cls="px-6 py-3"),
@@ -42,19 +59,13 @@ class ContactTable:
                     cls="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400",
                 ),
                 Tbody(
-                    Tr(
-                        Th(
-                            'Apple MacBook Pro 17"',
-                            scope="row",
-                            cls="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white",
-                        ),
-                        Td("Silver", cls="px-6 py-4"),
-                        Td("Laptop", cls="px-6 py-4"),
-                        Td("$2999", cls="px-6 py-4"),
-                    ),
-                    *[self._render_contact_row(contact) for contact in self.contacts],
+                    *[
+                        ContactRow(job_opening=job, contact=contact)
+                        for (job, contact) in self.job_contacts
+                    ]
                 ),
                 cls="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400",
+                # hx_post="/find_contacts",
+                **self.kwargs,
             ),
-            cls="relative overflow-x-auto shadow-md sm:rounded-lg",
         )

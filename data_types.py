@@ -14,12 +14,12 @@ class Company:
 
 @dataclass
 class JobOpening:
-    id: str
     title: str
     company: Company
     location: Optional[str]
     link: str
     related: bool
+    id: str = field(default_factory=lambda: str(uuid4()))
 
     def __ft__(self):
         location = P(
@@ -30,7 +30,7 @@ class JobOpening:
                 id="default-checkbox",
                 type="checkbox",
                 name="jobs[]",
-                value=f"item-{self.id}",
+                value=self.id,
                 cls="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600",
             ),
             Label(
@@ -44,29 +44,16 @@ class JobOpening:
                 cls="ms-2 font-medium text-gray-900 dark:text-gray-300",
             ),
             cls="flex items-center mb-2",
-            id=f"item-{self.id}",
+            id=f"opening-{self.id}",
         )
 
 
 @dataclass
 class Contact:
     name: str
-    email: Optional[str]
-    job_title: Optional[str]
-    location: Optional[str]
+    company: Company
+    email: Optional[str] = None
+    notes: Optional[str] = None
+    job_title: Optional[str] = None
+    location: Optional[str] = None
     id: str = field(default_factory=lambda: str(uuid4()))
-
-    def __ft__(self):
-        return Div(
-            P(
-                self.name,
-                " - ",
-                self.job_title,
-                " - ",
-                self.location,
-                " - ",
-                self.email,
-            ),
-            cls="flex items-center mb-2",
-            id=f"item-{self.id}",
-        )
