@@ -43,7 +43,7 @@ class ContactTable:
         return (
             Div(
                 "Potential",
-                CompanyTag(self.company.name),
+                CompanyTag(self.company.name.title()),
                 "Contacts",
                 cls="flex gap-x-2 py-5 text-lg font-semibold text-left rtl:text-right text-gray-900 bg-white dark:text-white dark:bg-gray-800",
             ),

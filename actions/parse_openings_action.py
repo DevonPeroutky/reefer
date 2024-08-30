@@ -29,11 +29,11 @@ class ParseOpeningsAction(BaseAction[List[JobOpening]]):
         yield to_xml(event)
         await asyncio.sleep(1)
 
-        # job_openings = self.scraping_service.parse_openings_from_link(
-        #     company=self.company,
-        #     job_type=self.job_type,
-        # )
-        job_openings = test_openings
+        job_openings = self.scraping_service.parse_openings_from_link(
+            company=company,
+            job_type=job_type,
+        )
+        # job_openings = test_openings
         self.openings = job_openings
 
         event.complete_task(openings=job_openings)

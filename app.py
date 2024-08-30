@@ -16,7 +16,7 @@ agent = Agent()
 
 @app.route("/")
 def get():
-    page_title = H1("Reefer", cls="text-4xl font-bold text-center")
+    page_title = H1("Reefer", cls="mt-12 text-4xl font-bold text-center")
     search_input = SearchInput(
         id="search_form",
         hx_post="/action_plan",
@@ -51,22 +51,7 @@ def fetch_action_plan(company_name: str):
 async def render_contact_table(request: Request, company_name: str):
     # TODO: Don't do it this way
     form = await request.form()
-    print("Form: ", form)
     job_ids = cast(List[str], form.getlist("jobs[]"))
-    print("JOBS IDs: ", job_ids)
-
-    response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
-    response.headers["Transfer-Encoding"] = "chunked"
-    return response
-
-
-@app.post("/stream_contacts")
-async def stream_contacts(request: Request):
-    # TODO: Don't do it this way
-    form = await request.form()
-    print("Form: ", form)
-    job_ids = cast(List[str], form.getlist("jobs[]"))
-    print("JOBS IDs: ", job_ids)
 
     response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
     response.headers["Transfer-Encoding"] = "chunked"

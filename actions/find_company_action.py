@@ -38,8 +38,8 @@ class FindCompanyAction(BaseAction[Company]):
         yield to_xml(event)
         await asyncio.sleep(0.1)
 
-        # careers_page_url = self.serp_service.find_careers_url(event.company_name)
-        careers_page_url = "https://www.brex.com/careers"
+        careers_page_url = self.serp_service.find_careers_url(event.company_name)
+        # careers_page_url = "https://www.brex.com/careers"
 
         event.complete_task(link=careers_page_url)
 
@@ -55,13 +55,13 @@ class FindCompanyAction(BaseAction[Company]):
         yield to_xml(find_openings_page_event)
         await asyncio.sleep(0.1)
 
-        # openings_page_url = (
-        #     self.scraping_service.find_openings_page_link(
-        #         link=careers_page_url, company=event.company_name
-        #     )
-        #     or careers_page_url
-        # )
-        openings_page_url = "https://www.brex.com/careers#jobsBoard"
+        openings_page_url = (
+            self.scraping_service.find_openings_page_link(
+                link=careers_page_url, company=event.company_name
+            )
+            or careers_page_url
+        )
+        # openings_page_url = "https://www.brex.com/careers#jobsBoard"
 
         # Store the found information
         self.careers_link = careers_page_url

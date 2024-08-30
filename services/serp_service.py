@@ -39,7 +39,7 @@ class SerpService:
                 name="Pedro Franceschi",
                 job_title="Software Engineer",
                 location="San Francisco",
-                email="john@brex.com",
+                email="pedro@brex.com",
                 company=company,
             ),
             Contact(

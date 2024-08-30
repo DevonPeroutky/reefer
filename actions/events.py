@@ -321,7 +321,7 @@ class ParseJobDescriptionEvent(ActionEvent):
             H3("Parsing job description for"),
             JobTypeTag(self.job.title),
             H3("at"),
-            CompanyTag(self.job.company.name),
+            CompanyTag(self.job.company.name.title()),
             cls=title_cls,
         )
 
