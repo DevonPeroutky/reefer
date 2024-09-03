@@ -41,6 +41,7 @@ class FindContactsAction(BaseAction[List[Contact]]):
             yield to_xml(parse_job_description)
             await asyncio.sleep(1)
 
+            print(f"Searching for query terms for ", (job))
             res = self.scraping_service.find_query_terms_from_job_description(job)
             keywords = res.get("keywords", [])
             positions = res.get("positions", [])
@@ -67,7 +68,7 @@ class FindContactsAction(BaseAction[List[Contact]]):
             contacts = self.serp_service.find_list_of_contacts(
                 company=job.company,
                 keywords=keywords,
-                targetted_role=positions,
+                targetted_roles=positions,
             )
             for contact in contacts:
                 job_contacts.append((job, contact))

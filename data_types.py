@@ -21,6 +21,9 @@ class JobOpening:
     related: bool
     id: str = field(default_factory=lambda: str(uuid4()))
 
+    def __str__(self):
+        return f"{self.title} ({self.link})"
+
     def __ft__(self):
         location = P(
             " (" + self.location + ")" if self.location else "",

@@ -1,4 +1,5 @@
 import json
+import time
 import os
 from fasthtml.common import dataclass
 import undetected_chromedriver as uc
@@ -31,7 +32,7 @@ This is the html content of the {} job page at {}. I'm trying to find the most r
 
 Parse the page and return two lists:
 
-- The list of keywords or terms that are most relevant to the job description. 
+- The list of keywords or terms that are most relevant to the job description. Stick to skills and technologies, ignore locations and other general words (Ex. if the job is for a "Software Engineer", the list could contain "Python", "Django", "React", "GraphQL" )
 - The list of potential relevant positions involved for hiring for this role. (Ex. if the job is for a "Software Engineer", the list could contain "Engineering Manager", "Software Engineering", "Technical Lead" )
 
 The two list should be returned as a JSON with the keys "keywords" and "positions". Provide only the JSON, with no additional text or explanation.
@@ -196,14 +197,17 @@ class ScrapingService:
     def find_query_terms_from_job_description(
         self, job_opening: JobOpening
     ) -> Dict[str, List[str]]:
-        return {
-            "keywords": ["Python", "Django", "React", "GraphQL"],
-            "positions": [
-                "Engineering Manager",
-                "Software Engineering",
-                "Technical Lead",
-            ],
-        }
+        # Sleep for 3 seconds to simulate a long running task
+        # time.sleep(3)
+
+        # return {
+        #     "keywords": ["Python", "Django", "React", "GraphQL"],
+        #     "positions": [
+        #         "Engineering Manager",
+        #         "Software Engineering",
+        #         "Technical Lead",
+        #     ],
+        # }
 
         raw_html = ScrapingService.get_page_source(job_opening.link)
         cleaned_html = str(ScrapingService.strip_html(raw_html))

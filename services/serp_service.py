@@ -29,28 +29,31 @@ class SerpService:
         return results[0]["link"]
 
     def find_list_of_contacts(
-        self, company: Company, keywords: List[str], targetted_role: List[str]
+        self, company: Company, keywords: List[str], targetted_roles: List[str]
     ) -> List[Contact]:
 
-        time.sleep(1)
-
-        return [
-            Contact(
-                name="Pedro Franceschi",
-                job_title="Software Engineer",
-                location="San Francisco",
-                email="pedro@brex.com",
-                company=company,
-            ),
-            Contact(
-                name="Jane Smith",
-                job_title="Engineering Manager",
-                location="San Francisco",
-                email="",
-                company=company,
-            ),
-        ]
-        query = "{} careers".format(company)
+        # time.sleep(1)
+        #
+        # return [
+        #     Contact(
+        #         name="Pedro Franceschi",
+        #         job_title="Software Engineer",
+        #         location="San Francisco",
+        #         email="pedro@brex.com",
+        #         company=company,
+        #     ),
+        #     Contact(
+        #         name="Jane Smith",
+        #         job_title="Engineering Manager",
+        #         location="San Francisco",
+        #         email="",
+        #         company=company,
+        #     ),
+        # ]
+        query = "{} {} {}".format(
+            company, " ".join(keywords), " ".join(targetted_roles)
+        )
         res = self._search(query)
         results = json.loads(res)["organic_results"]
-        # print("Search Results: ", results)
+        print("Search Results: ", results)
+        return results

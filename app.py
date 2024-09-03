@@ -36,7 +36,7 @@ def get():
                 search_input,
                 results,
             ),
-            cls="flex justify-center",
+            cls="flex justify-center py-12",
         ),
         FLOWBITE_INCLUDE_SCRIPT,
     )
@@ -47,17 +47,6 @@ def fetch_action_plan(company_name: str):
     return Timeline(events=[], id="action_plan_timeline", company_name=company_name)
 
 
-@app.post("/contacts_table")
-async def render_contact_table(request: Request, company_name: str):
-    # TODO: Don't do it this way
-    form = await request.form()
-    job_ids = cast(List[str], form.getlist("jobs[]"))
-
-    response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
-    response.headers["Transfer-Encoding"] = "chunked"
-    return response
-
-
 @app.post("/stream_action_plan")
 async def streaming_action_plan(
     company_name: str,
@@ -65,5 +54,17 @@ async def streaming_action_plan(
     response = StreamingResponse(
         agent.find_company_information(company_name), media_type="text/html"
     )
+    response.headers["Transfer-Encoding"] = "chunked"
+    return response
+
+
+@app.post("/contacts_table")
+async def render_contact_table(request: Request, company_name: str):
+    # TODO: Don't do it this way
+    form = await request.form()
+    job_ids = cast(List[str], form.getlist("jobs[]"))
+
+    print("Finding contacts for jobs: ", job_ids)
+    response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
     response.headers["Transfer-Encoding"] = "chunked"
     return response
