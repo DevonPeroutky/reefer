@@ -2,15 +2,15 @@ import asyncio
 
 from typing import Optional, AsyncGenerator, List
 from fasthtml.common import Safe, to_xml
-from stub_data import test_openings
+from app.stub_data import test_openings
 
-from actions.events import (
+from app.actions.events import (
     BaseAction,
     ContactTableEvent,
     ParseOpeningsTask,
 )
-from services.scraping_service import ScrapingService
-from data_types import Company, Contact, JobOpening
+from app.services.scraping_service import ScrapingService
+from app import Company, Contact, JobOpening
 
 
 class ParseOpeningsAction(BaseAction[List[JobOpening]]):

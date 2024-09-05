@@ -1,10 +1,10 @@
 from fasthtml.common import *
 
-from components.primitives.success_icon import SearchIcon
-from components.primitives.spinner import Spinner
-from components.primitives.success_icon import SuccessIcon
+from app.components.primitives.success_icon import SearchIcon
+from app.components.primitives.spinner import Spinner
+from app.components.primitives.success_icon import SuccessIcon
 
-from enums import TaskStatus
+from app.actions import TaskStatus
 
 
 class TimelineEventStatusIndicator:

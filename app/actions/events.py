@@ -6,19 +6,19 @@ from uuid import uuid4
 from typing import List, Optional, TypeVar, Generic, AsyncGenerator, Tuple
 from fasthtml.common import *
 
-from components.application.timeline_status_indicator import (
+from app.components.application.timeline_status_indicator import (
     TimelineEventStatusIndicator,
 )
-from components.application.contact_table import ContactTable
-from components.primitives.tag import (
+from app.components.application.contact_table import ContactTable
+from app.components.primitives.tag import (
     CompanyTag,
     JobTypeTag,
     OutputInputTag,
     PositionTag,
     KeywordTag,
 )
-from data_types import Company, Contact, JobOpening
-from enums import TaskStatus, TaskType
+from app import Company, Contact, JobOpening
+from app.actions import TaskStatus, TaskType
 from abc import ABC, abstractmethod
 
 

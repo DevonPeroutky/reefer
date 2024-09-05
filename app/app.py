@@ -3,11 +3,11 @@ from typing import cast
 from fasthtml.common import *
 
 from starlette.responses import StreamingResponse
-from components.primitives.search_input import SearchInput
-from components.application.contact_table import ContactTable
-from components.application.timeline import Timeline
-from custom_hdrs import CUSTOM_HDRS, FLOWBITE_INCLUDE_SCRIPT
-from services.action_planner import Agent
+from app.components.primitives.search_input import SearchInput
+from app.components.application.contact_table import ContactTable
+from app.components.application.timeline import Timeline
+from app.services.action_planner import Agent
+from app.custom_hdrs import CUSTOM_HDRS, FLOWBITE_INCLUDE_SCRIPT
 
 app = FastHTML(hdrs=CUSTOM_HDRS, live=True)
 

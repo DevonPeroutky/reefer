@@ -1,8 +1,8 @@
 from fasthtml.common import *
 from typing import List, Tuple
 
-from components.primitives.tag import CompanyTag
-from data_types import Company, Contact, JobOpening
+from app.components.primitives.tag import CompanyTag
+from app import Company, Contact, JobOpening
 
 
 class ContactRow:

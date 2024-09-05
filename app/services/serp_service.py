@@ -5,7 +5,7 @@ import json
 
 from fasthtml.common import List
 
-from data_types import Company, Contact
+from app import Company, Contact
 
 
 class SerpService:

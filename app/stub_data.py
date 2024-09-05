@@ -1,9 +1,9 @@
-from actions.events import (
+from app.actions.events import (
     FindCareersPageTask,
     FindOpeningsPageTask,
     ParseOpeningsTask,
 )
-from data_types import Company, JobOpening
+from app import Company, JobOpening
 from fasthtml.common import Div, Ol, ft
 
 brex = Company(

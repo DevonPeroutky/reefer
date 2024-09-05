@@ -1,11 +1,11 @@
-from actions.find_company_action import FindCompanyAction
-from actions.parse_openings_action import ParseOpeningsAction
-from actions.find_contacts_action import FindContactsAction
 from typing import List, Optional
 
-from data_types import Company, Contact, JobOpening
-from services.serp_service import SerpService
-from services.scraping_service import ScrapingService
+from app.actions.find_company_action import FindCompanyAction
+from app.actions.parse_openings_action import ParseOpeningsAction
+from app.actions.find_contacts_action import FindContactsAction
+from app import Company, Contact, JobOpening
+from app.services.serp_service import SerpService
+from app.services.scraping_service import ScrapingService
 
 
 class Agent:

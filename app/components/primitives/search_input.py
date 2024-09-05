@@ -2,7 +2,7 @@ from typing import Optional
 from fasthtml.common import *
 import fasthtml.svg as svg
 
-from components.primitives.success_icon import SearchIcon
+from app.components.primitives.success_icon import SearchIcon
 
 
 class SearchInput:

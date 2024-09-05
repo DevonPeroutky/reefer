@@ -3,17 +3,17 @@ import asyncio
 from typing import List, Optional, TypeVar, Generic, AsyncGenerator
 from fasthtml.common import Safe, to_xml
 
-from actions.events import (
+from app.actions.events import (
     ContactTableEvent,
     FindCareersPageTask,
     FindOpeningsPageTask,
     BaseAction,
 )
-from components.application.contact_table import ContactTable
-from services.serp_service import SerpService
-from services.scraping_service import ScrapingService
-from data_types import Company, Contact, JobOpening
-from enums import TaskStatus, TaskType
+from app.components.application.contact_table import ContactTable
+from app.services.serp_service import SerpService
+from app.services.scraping_service import ScrapingService
+from app import Company, Contact, JobOpening
+from app.actions import TaskStatus, TaskType
 
 
 class FindCompanyAction(BaseAction[Company]):

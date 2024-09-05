@@ -15,7 +15,7 @@ from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
-from data_types import JobOpening, Company
+from app import JobOpening, Company
 
 PARSE_HTML_SYSTEM_PROMPT = """Your job is to simply return structured data as requested. You parse the full document and return all the results. Provide only the answer, with no additional text or explanation. Do not answer with I Understand or similiar"""
 PARSE_OPENINGS_LINK_PROMPT = """
