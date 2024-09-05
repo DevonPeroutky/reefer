@@ -1,6 +1,6 @@
 from uuid import uuid4
 from dataclasses import dataclass, field
-from typing import Optional
+from typing import List, Optional
 from fasthtml.common import Div, Input, Label, A, P
 
 
@@ -20,6 +20,8 @@ class JobOpening:
     link: str
     related: bool
     id: str = field(default_factory=lambda: str(uuid4()))
+    keywords: List[str] = field(default_factory=list)
+    positions: List[str] = field(default_factory=list)
 
     def __str__(self):
         return f"{self.title} ({self.link})"

@@ -4,6 +4,7 @@ from app.actions.find_company_action import FindCompanyAction
 from app.actions.parse_openings_action import ParseOpeningsAction
 from app.actions.find_contacts_action import FindContactsAction
 from app import Company, Contact, JobOpening
+from app.actions.research_job_action import ResearchJobAction
 from app.services.serp_service import SerpService
 from app.services.scraping_service import ScrapingService
 
@@ -45,6 +46,24 @@ class Agent:
         self.openings = parse_openings_action.yield_action_result()
         print(self.openings)
         print(f"TODO: Asynchronously write {self.openings} to DB")
+
+    async def research_job_openings(self, job_ids: List[str]):
+        assert self.company, "Company is not determined?"
+
+        desired_job_openings = list(
+            filter(lambda job: job.id in job_ids, self.openings)
+        )
+        print("Desired Job Openings: ", desired_job_openings)
+
+        for job in desired_job_openings:
+            research_job_action = ResearchJobAction(
+                scraping_service=self.scraping_service,
+            )
+
+            async for event in research_job_action.yield_action_stream(
+                desired_job_openings
+            ):
+                yield event
 
     async def find_contacts(self, job_ids: List[str]):
         assert self.company, "Company is not determined?"

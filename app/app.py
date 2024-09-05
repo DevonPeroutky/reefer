@@ -58,6 +58,18 @@ async def streaming_action_plan(
     return response
 
 
+@app.post("/research_jobs")
+async def research_jobs(request: Request, company_name: str):
+    # TODO: Don't do it this way
+    form = await request.form()
+    job_ids = cast(List[str], form.getlist("jobs[]"))
+
+    print("Finding information for jobs: ", job_ids)
+    response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
+    response.headers["Transfer-Encoding"] = "chunked"
+    return response
+
+
 @app.post("/contacts_table")
 async def render_contact_table(request: Request, company_name: str):
     # TODO: Don't do it this way
