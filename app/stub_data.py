@@ -1,9 +1,9 @@
-from app.actions.events import (
+from app.components.events import (
     FindCareersPageTask,
     FindOpeningsPageTask,
     ParseOpeningsTask,
 )
-from app import Company, JobOpening
+from app import Company, Contact, JobOpening
 from fasthtml.common import Div, Ol, ft
 
 brex = Company(
@@ -11,6 +11,36 @@ brex = Company(
     opening_link="https://www.brex.com/careers#jobsBoard",
     careers_link="https://www.brex.com/careers",
 )
+
+spotter = Company(
+    name="Spotter",
+    opening_link="https://job-boards.greenhouse.io/spotter",
+    careers_link="https://job-boards.greenhouse.io/spotter",
+)
+
+
+spotter_openings = [
+    JobOpening(
+        id="0",
+        company=spotter,
+        title="AI Engineer",
+        location="Los Angeles, CA",
+        link="https://job-boards.greenhouse.io/spotter/jobs/4413256005",
+        related=True,
+        keywords=["AI", "Machine Learning", "Python"],
+        positions=["Engineering Manager", "Product Manager"],
+    ),
+    JobOpening(
+        id="1",
+        company=spotter,
+        title="Senior AI Prompt Engineer",
+        location="Los Angeles, CA",
+        link="https://job-boards.greenhouse.io/spotter/jobs/4417247005",
+        related=True,
+        keywords=["AI", "Machine Learning", "Python"],
+        positions=["Engineering Manager", "Senior Engineer"],
+    ),
+]
 
 test_openings = [
     JobOpening(
@@ -111,6 +141,25 @@ test_openings = [
     ),
 ]
 
+
+test_contacts = [
+    Contact(
+        name="Pedro Franceschi",
+        job_title="Software Engineer",
+        location="San Francisco",
+        email="pedro@brex.com",
+        company=brex,
+    ),
+    Contact(
+        name="Jane Smith",
+        job_title="Engineering Manager",
+        location="San Francisco",
+        email="",
+        company=brex,
+    ),
+]
+
+
 test_actions = []
 spotter_action = FindCareersPageTask(company_name="Spotter")
 
@@ -129,15 +178,9 @@ brex_openings_action = ParseOpeningsTask(
 )
 brex_openings_action.complete_task(test_openings)
 
-# brex_contacts_action = FindContactsTask(
-#     company=brex_openings_page_action.company_name,
-#     job_id="job-17",
-# )
-
 test_actions.append(brex_action)
 test_actions.append(brex_openings_page_action)
 test_actions.append(brex_openings_action)
-# test_actions.append(brex_contacts_action)
 
 
 TEST_ACTION_PLAN = Div(

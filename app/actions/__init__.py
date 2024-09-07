@@ -1,9 +1,12 @@
+import asyncio
+
 from enum import Enum
 from abc import ABC, abstractmethod
-from typing import AsyncGenerator, TypeVar, Generic
+from typing import AsyncGenerator, List, TypeVar, Generic
 from fasthtml.common import Safe
 
 T = TypeVar("T")
+
 
 class TaskStatus(Enum):
     PENDING = "PENDING"
@@ -22,9 +25,14 @@ class TaskType(Enum):
 
 class BaseAction(ABC, Generic[T]):
     @abstractmethod
-    async def yield_action_stream(self, *args, **kwargs) -> AsyncGenerator[Safe, None]:
+    async def yield_action_stream(self, *args, **kwargs):
         pass
 
     @abstractmethod
     def yield_action_result(self) -> T:
         pass
+
+    async def yield_dummy_stream(self, items: List[T], schedule: List[int]):
+        for item, delay in zip(items, schedule):
+            await asyncio.sleep(delay)
+            yield item

@@ -1,3 +1,5 @@
+from abc import ABC, abstractmethod
+import random
 import json
 import time
 import os
@@ -16,6 +18,7 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 from app import JobOpening, Company
+from app.stub_data import test_openings
 
 PARSE_HTML_SYSTEM_PROMPT = """Your job is to simply return structured data as requested. You parse the full document and return all the results. Provide only the answer, with no additional text or explanation. Do not answer with I Understand or similiar"""
 PARSE_OPENINGS_LINK_PROMPT = """
@@ -39,7 +42,25 @@ The two list should be returned as a JSON with the keys "keywords" and "position
 """
 
 
-class ScrapingService:
+class ScrapingService(ABC):
+    @abstractmethod
+    def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
+        pass
+
+    @abstractmethod
+    def find_query_terms_from_job_description(
+        self, job_opening: JobOpening
+    ) -> Dict[str, List[str]]:
+        pass
+
+    @abstractmethod
+    def parse_openings_from_link(
+        self, job_type: str, company: Company
+    ) -> List[JobOpening]:
+        pass
+
+
+class CareersPageScrapingService(ScrapingService):
 
     def __init__(self):
         anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
@@ -227,3 +248,32 @@ class ScrapingService:
         json_response = json.loads(text_responses)
         print(json_response)
         return json_response
+
+
+class DummyScrapingService(ScrapingService):
+
+    def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
+        time_to_sleep = random.randint(1, 8)
+        time.sleep(time_to_sleep)
+
+        return f"https://www.{company}.com/careers"
+
+    def find_query_terms_from_job_description(
+        self, job_opening: JobOpening
+    ) -> Dict[str, List[str]]:
+        time_to_sleep = random.randint(1, 8)
+        time.sleep(time_to_sleep)
+        return {
+            "keywords": ["Python", "Django", "React", "GraphQL"],
+            "positions": [
+                "Engineering Manager",
+                "Software Engineering",
+                "Technical Lead",
+            ],
+        }
+
+    def parse_openings_from_link(self, job_type, company: Company) -> List[JobOpening]:
+        time_to_sleep = random.randint(1, 8)
+        time.sleep(time_to_sleep)
+
+        return test_openings

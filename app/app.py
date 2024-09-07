@@ -8,10 +8,14 @@ from app.components.application.contact_table import ContactTable
 from app.components.application.timeline import Timeline
 from app.services.action_planner import Agent
 from app.custom_hdrs import CUSTOM_HDRS, FLOWBITE_INCLUDE_SCRIPT
+from app.services.scraping_service import DummyScrapingService
+from app.services.serp_service import DummySearchService
 
 app = FastHTML(hdrs=CUSTOM_HDRS, live=True)
 
-agent = Agent()
+agent = Agent(
+    serp_service=DummySearchService(), scraping_service=DummyScrapingService()
+)
 
 
 @app.route("/")
@@ -65,7 +69,9 @@ async def research_jobs(request: Request, company_name: str):
     job_ids = cast(List[str], form.getlist("jobs[]"))
 
     print("Finding information for jobs: ", job_ids)
-    response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
+    response = StreamingResponse(
+        agent.research_job_openings(job_ids), media_type="text/html"
+    )
     response.headers["Transfer-Encoding"] = "chunked"
     return response
 

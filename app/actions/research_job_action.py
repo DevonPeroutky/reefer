@@ -1,18 +1,15 @@
+import time
+import random
 import asyncio
 
-from typing import Optional, AsyncGenerator, List, Tuple
+from typing import Optional, AsyncGenerator
 from fasthtml.common import Safe, to_xml
 
-from app.components.application.contact_table import ContactRow, ContactTable
-from app.stub_data import test_openings
+from app.actions import BaseAction
+from app.components.events.parse_job_description_event import ParseJobDescriptionEvent
 
-from app.actions.events import (
-    BaseAction,
-    ParseJobDescriptionEvent,
-)
 from app.services.scraping_service import ScrapingService
-from app.services.serp_service import SerpService
-from app import Company, Contact, JobOpening
+from app import JobOpening
 
 
 class ResearchJobAction(BaseAction[JobOpening]):
@@ -24,7 +21,7 @@ class ResearchJobAction(BaseAction[JobOpening]):
         self.scraping_service = scraping_service or ScrapingService()
         self.job_opening = job_opening
 
-    async def yield_action_stream(self):
+    async def yield_action_stream(self) -> AsyncGenerator[Safe, None]:
 
         # TODO: Yield a Job Description loading event
         parse_job_description = ParseJobDescriptionEvent(self.job_opening)

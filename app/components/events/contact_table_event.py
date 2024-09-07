@@ -1,6 +1,7 @@
-from app.components.events import ActionEvent
 from app.components.application.contact_table import ContactTable
-from app.components.application.timeline_status_indicator import TimelineEventStatusIndicator
+from app.components.application.timeline_status_indicator import (
+    TimelineEventStatusIndicator,
+)
 from app.actions import TaskStatus
 from fasthtml.common import *
 from app import Company, Contact, JobOpening

@@ -2,14 +2,14 @@ import asyncio
 
 from typing import Optional, AsyncGenerator, List
 from fasthtml.common import Safe, to_xml
+from app.actions import BaseAction
 from app.stub_data import test_openings
 
-from app.actions.events import (
-    BaseAction,
+from app.components.events import (
     ContactTableEvent,
     ParseOpeningsTask,
 )
-from app.services.scraping_service import ScrapingService
+from app.services.scraping_service import CareersPageScrapingService, ScrapingService
 from app import Company, Contact, JobOpening
 
 
@@ -18,7 +18,7 @@ class ParseOpeningsAction(BaseAction[List[JobOpening]]):
         self,
         scraping_service: Optional[ScrapingService] = None,
     ):
-        self.scraping_service = scraping_service or ScrapingService()
+        self.scraping_service = scraping_service or CareersPageScrapingService()
         self.openings = []
 
     async def yield_action_stream(

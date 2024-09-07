@@ -1,6 +1,0 @@
-from app.components.events import ActionEvent
-from app.components.events.find_careers_page_task import FindCareersPageTask
-from app.components.events.find_openings_page_task import FindOpeningsPageTask
-from app.components.events.parse_openings_task import ParseOpeningsTask
-from app.components.events.parse_job_description_event import ParseJobDescriptionEvent
-from app.components.events.contact_table_event import ContactTableEvent

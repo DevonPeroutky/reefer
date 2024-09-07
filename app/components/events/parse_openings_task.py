@@ -1,3 +1,5 @@
+import fasthtml.svg as svg
+
 from app.components.events import ActionEvent
 from app.components.primitives.tag import CompanyTag, JobTypeTag, OutputInputTag
 from app.actions import TaskStatus, TaskType
@@ -94,7 +96,8 @@ class ParseOpeningsTask(ActionEvent):
                         ),
                         cls="flex font-medium gap-x-2 mt-8",
                     ),
-                    hx_post=f"/contacts_table?company_name={self.company.name}",
+                    # hx_post=f"/contacts_table?company_name={self.company.name}",
+                    hx_post=f"/research_jobs?company_name={self.company.name}",
                     hx_target="#action_plan_timeline",
                     hx_swap="beforeend",
                     hx_ext="chunked-transfer",

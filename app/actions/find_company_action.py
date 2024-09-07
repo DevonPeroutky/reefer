@@ -1,25 +1,23 @@
 import asyncio
 
 from typing import List, Optional, TypeVar, Generic, AsyncGenerator
-from fasthtml.common import Safe, to_xml
+from fasthtml.common import Safe, Search, to_xml
 
-from app.actions.events import (
-    ContactTableEvent,
+from app.components.events import (
     FindCareersPageTask,
     FindOpeningsPageTask,
-    BaseAction,
 )
 from app.components.application.contact_table import ContactTable
-from app.services.serp_service import SerpService
+from app.services.serp_service import SearchService, SerpService
 from app.services.scraping_service import ScrapingService
 from app import Company, Contact, JobOpening
-from app.actions import TaskStatus, TaskType
+from app.actions import BaseAction, TaskStatus, TaskType
 
 
 class FindCompanyAction(BaseAction[Company]):
     def __init__(
         self,
-        serp_service: Optional[SerpService] = None,
+        serp_service: Optional[SearchService] = None,
         scraping_service: Optional[ScrapingService] = None,
     ):
         self.serp_service = serp_service or SerpService()

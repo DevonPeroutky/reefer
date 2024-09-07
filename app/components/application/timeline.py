@@ -1,8 +1,7 @@
 from typing import List, TypeVar
-import fasthtml.svg as svg
-from fasthtml.common import Div, Span, Li, H3, P, Ol
+from fasthtml.common import Ol
 
-from app.actions.events import ActionEvent, TaskStatus
+from app.components.events import ActionEvent
 
 
 T = TypeVar("T", bound="ActionEvent")

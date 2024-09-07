@@ -1,19 +1,18 @@
 import asyncio
 
 from typing import Optional, AsyncGenerator, List, Tuple
-from fasthtml.common import Safe, to_xml
+from fasthtml.common import Safe, Search, to_xml
 
+from app.actions import BaseAction
 from app.components.application.contact_table import ContactRow, ContactTable
 from app.stub_data import test_openings
 
-from app.actions.events import (
-    BaseAction,
+from app.components.events import (
     ContactTableEvent,
     ParseJobDescriptionEvent,
-    ParseOpeningsTask,
 )
-from app.services.scraping_service import ScrapingService
-from app.services.serp_service import SerpService
+from app.services.scraping_service import CareersPageScrapingService, ScrapingService
+from app.services.serp_service import SearchService, SerpService
 from app import Company, Contact, JobOpening
 
 
@@ -22,12 +21,12 @@ class FindContactsAction(BaseAction[List[Contact]]):
         self,
         company: Company,
         job_type: str,
-        serp_service: Optional[SerpService] = None,
+        serp_service: Optional[SearchService] = None,
         scraping_service: Optional[ScrapingService] = None,
     ):
         self.company = company
         self.job_type = job_type
-        self.scraping_service = scraping_service or ScrapingService()
+        self.scraping_service = scraping_service or CareersPageScrapingService()
         self.serp_service = serp_service or SerpService()
         self.contacts = []
 

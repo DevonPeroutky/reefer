@@ -1,14 +1,29 @@
+from abc import ABC, abstractmethod
 import os
 import time
+import random
 import requests
 import json
 
-from fasthtml.common import List
+from fasthtml.common import List, Search
 
 from app import Company, Contact
+from app.stub_data import test_contacts
 
 
-class SerpService:
+class SearchService(ABC):
+    @abstractmethod
+    def find_careers_url(self, company: str) -> str:
+        pass
+
+    @abstractmethod
+    def find_list_of_contacts(
+        self, company: Company, keywords: List[str], targetted_roles: List[str]
+    ) -> List[Contact]:
+        pass
+
+
+class SerpService(SearchService):
     def __init__(self):
         self.api_key = os.getenv("SERPDOG_API_KEY")
         assert self.api_key, "SERPDOG_API_KEY environment variable is not set."
@@ -34,22 +49,6 @@ class SerpService:
 
         # time.sleep(1)
         #
-        # return [
-        #     Contact(
-        #         name="Pedro Franceschi",
-        #         job_title="Software Engineer",
-        #         location="San Francisco",
-        #         email="pedro@brex.com",
-        #         company=company,
-        #     ),
-        #     Contact(
-        #         name="Jane Smith",
-        #         job_title="Engineering Manager",
-        #         location="San Francisco",
-        #         email="",
-        #         company=company,
-        #     ),
-        # ]
         query = "{} {} {}".format(
             company, " ".join(keywords), " ".join(targetted_roles)
         )
@@ -57,3 +56,20 @@ class SerpService:
         results = json.loads(res)["organic_results"]
         print("Search Results: ", results)
         return results
+
+
+class DummySearchService(SearchService):
+    def find_careers_url(self, company: str) -> str:
+
+        time_to_sleep = random.randint(1, 8)
+        time.sleep(time_to_sleep)
+
+        return f"https://www.{company}.com/careers"
+
+    def find_list_of_contacts(
+        self, company: Company, keywords: List[str], targetted_roles: List[str]
+    ) -> List[Contact]:
+        time_to_sleep = random.randint(1, 8)
+        time.sleep(time_to_sleep)
+
+        return test_contacts
