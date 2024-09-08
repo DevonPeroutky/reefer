@@ -150,13 +150,13 @@ test_contacts = [
         email="pedro@brex.com",
         company=brex,
     ),
-    Contact(
-        name="Jane Smith",
-        job_title="Engineering Manager",
-        location="San Francisco",
-        email="",
-        company=brex,
-    ),
+    # Contact(
+    #     name="Jane Smith",
+    #     job_title="Engineering Manager",
+    #     location="San Francisco",
+    #     email="",
+    #     company=brex,
+    # ),
 ]
 
 

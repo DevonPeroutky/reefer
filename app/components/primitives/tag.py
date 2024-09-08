@@ -46,7 +46,7 @@ class OutputInputTag(Tag):
         return Div(
             Span(
                 self.child_node,
-                cls=f"px-2.5 py-0.5 rounded border border-green-200 dark:border-green-600 dark:text-green-300 dark:bg-green-600",
+                cls=f"px-2 py-0.5 rounded border border-green-200 dark:border-green-600 dark:text-green-300 dark:bg-green-600",
             ),
             **self.kwargs,
         )

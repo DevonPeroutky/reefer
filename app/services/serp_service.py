@@ -69,7 +69,7 @@ class DummySearchService(SearchService):
     def find_list_of_contacts(
         self, company: Company, keywords: List[str], targetted_roles: List[str]
     ) -> List[Contact]:
-        time_to_sleep = random.randint(1, 8)
+        time_to_sleep = random.randint(1, 3)
         time.sleep(time_to_sleep)
 
         return test_contacts

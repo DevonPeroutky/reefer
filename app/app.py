@@ -3,6 +3,11 @@ from typing import cast
 from fasthtml.common import *
 
 from starlette.responses import StreamingResponse
+from app import JobOpening
+from app.components.primitives.modal import (
+    ModalBody,
+    ModalButton,
+)
 from app.components.primitives.search_input import SearchInput
 from app.components.application.contact_table import ContactTable
 from app.components.application.timeline import Timeline
@@ -40,6 +45,12 @@ def get():
                 search_input,
                 results,
             ),
+            Div("SUCK THIS", id="fuck_me"),
+            ModalBody(
+                title="Contact Details",
+                body=Div("REPLACE THIS BODY????"),
+                id="details-modal",
+            ),
             cls="flex justify-center py-12",
         ),
         FLOWBITE_INCLUDE_SCRIPT,
@@ -48,7 +59,27 @@ def get():
 
 @app.post("/action_plan")
 def fetch_action_plan(company_name: str):
-    return Timeline(events=[], id="action_plan_timeline", company_name=company_name)
+    return Div(
+        ModalButton(
+            text="View Details",
+            hx_get=f"/modal?job_id={0}&contact_id={1}",
+            data_modal_target="details-modal",
+            data_modal_show="details-modal",
+            hx_swap="innerHTML",
+            hx_target="#details-modal-body",
+            hx_trigger="click",
+        ),
+        Timeline(events=[], id="action_plan_timeline", company_name=company_name),
+        ModalButton(
+            text="View Details",
+            hx_get=f"/modal?job_id={0}&contact_id={1}",
+            data_modal_target="details-modal",
+            data_modal_show="details-modal",
+            hx_swap="innerHTML",
+            hx_target="#details-modal-body",
+            hx_trigger="click",
+        ),
+    )
 
 
 @app.post("/stream_action_plan")
@@ -90,3 +121,23 @@ async def render_contact_table(request: Request, company_name: str):
     )
     response.headers["Transfer-Encoding"] = "chunked"
     return response
+
+
+@app.get("/modal")
+def modal(job_id: str, contact_id: str):
+    job: Optional[JobOpening] = agent.get_job_opening(job_id)
+    return Div(
+        "Job details for JOB",
+        id="details-modal-body",
+        hx_debug="true",
+    )
+    # return ModalBody(
+    #     title="Contact Details",
+    #     body=Div(
+    #         "Job details for {} - {}".format(
+    #             job.title if job else "Unknown", contact_id
+    #         ),
+    #         id="contact-details-modal-body",
+    #     ),
+    #     id="details-modal",
+    # )

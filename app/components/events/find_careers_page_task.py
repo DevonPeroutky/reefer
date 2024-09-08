@@ -1,4 +1,5 @@
 from app.components.events import ActionEvent
+from app.components.primitives.modal import ModalButton
 from app.components.primitives.tag import CompanyTag
 from app.actions import TaskStatus, TaskType
 from fasthtml.common import *
@@ -31,6 +32,16 @@ class FindCareersPageTask(ActionEvent):
     def _render_details(self):
         return (
             Div(
+                ModalButton(
+                    text="View Details",
+                    # hx_get=f"/modal?job_id={self.job_opening.id}&contact_id={self.contact.id}",
+                    hx_get=f"/modal?job_id={0}&contact_id={1}",
+                    data_modal_target="details-modal",
+                    data_modal_show="details-modal",
+                    hx_swap="innerHTML",
+                    hx_target="#details-modal-body",
+                    hx_trigger="click",
+                ),
                 "Found... ",
                 A(
                     self.link,

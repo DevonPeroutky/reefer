@@ -4,7 +4,9 @@ from typing import List, Optional, AsyncGenerator, Any
 from fasthtml.common import Safe, to_xml
 
 from app.actions import TaskStatus
-from app.components.application.timeline_status_indicator import TimelineEventStatusIndicator
+from app.components.application.timeline_status_indicator import (
+    TimelineEventStatusIndicator,
+)
 from app.components.events.contact_table_event import ContactTableEvent
 from app.stub_data import spotter, spotter_openings
 from app.actions.find_company_action import FindCompanyAction
@@ -60,6 +62,9 @@ class Agent:
         self.desired_job_openings: List[JobOpening] = []
         self.contacts: List[Contact] = []
 
+    def get_job_opening(self, job_id: str) -> Optional[JobOpening]:
+        return next(filter(lambda job: job.id == job_id, self.openings), None)
+
     async def find_company_information(self, company_name: str):
 
         # 1. Find company
@@ -92,8 +97,8 @@ class Agent:
     async def research_job_openings(self, job_ids: List[str]):
         openings = self.openings or spotter_openings
 
-        self.desired_job_openings: List[JobOpening] = (
-            list(filter(lambda job: job.id in job_ids, openings))
+        self.desired_job_openings: List[JobOpening] = list(
+            filter(lambda job: job.id in job_ids, openings)
         )
         print("Desired Job Openings: ", self.desired_job_openings)
 
@@ -109,14 +114,12 @@ class Agent:
             await asyncio.sleep(0.1)
 
         contact_table = ContactTableEvent(
-            id="contact-table",
-            company=self.company or spotter, job_contacts=[]
+            id="contact-table", company=self.company or spotter, job_contacts=[]
         )
         yield to_xml(contact_table)
         # await asyncio.sleep(0.1)
 
     async def find_contacts(self, job_openings: List[JobOpening]):
-        assert self.company, "Company is not determined?"
 
         find_contacts_tasks = [
             FindContactsAction(
@@ -129,4 +132,3 @@ class Agent:
         async for res in combine_generators(*find_contacts_tasks):
             yield res
             await asyncio.sleep(0.1)
-
