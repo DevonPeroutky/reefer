@@ -8,6 +8,7 @@ from app.components.application.timeline_status_indicator import (
     TimelineEventStatusIndicator,
 )
 from app.components.events.contact_table_event import ContactTableEvent
+from app.components.primitives.success_icon import SuccessIcon
 from app.stub_data import spotter, spotter_openings
 from app.actions.find_company_action import FindCompanyAction
 from app.actions.parse_openings_action import ParseOpeningsAction
@@ -132,3 +133,11 @@ class Agent:
         async for res in combine_generators(*find_contacts_tasks):
             yield res
             await asyncio.sleep(0.1)
+
+        yield to_xml(
+            SuccessIcon(
+                id=f"contact-table-loader",
+                hx_swap_oob="outerHTML:#contact-table-loader",
+            )
+        )
+        await asyncio.sleep(0.1)

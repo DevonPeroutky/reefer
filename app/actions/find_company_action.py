@@ -8,7 +8,7 @@ from app.components.events import (
     FindOpeningsPageTask,
 )
 from app.services.serp_service import SearchService, SerpService
-from app.services.scraping_service import ScrapingService
+from app.services.scraping_service import ScrapingService, CareersPageScrapingService
 from app import Company
 from app.actions import BaseAction, TaskStatus
 
@@ -20,7 +20,7 @@ class FindCompanyAction(BaseAction[Company]):
         scraping_service: Optional[ScrapingService] = None,
     ):
         self.serp_service = serp_service or SerpService()
-        self.scraping_service = scraping_service or ScrapingService()
+        self.scraping_service = scraping_service or CareersPageScrapingService()
         self.status = TaskStatus.IN_PROGRESS
         self.openings_link = None
         self.careers_link = None

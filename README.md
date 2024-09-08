@@ -2,8 +2,9 @@
 
 
 # Milestone 1 - Demo-able 
-- [ ] Figure out how to do [modal w/chunked transfer](https://discord.com/channels/689892369998676007/1247700012952191049/1282255144913866823)
+- [x] Figure out how to do [modal w/chunked transfer](https://discord.com/channels/689892369998676007/1247700012952191049/1282255144913866823)
 - [ ] Test finding contacts E2E
+  - [ ] Make Contacts Table icon to complete
 - [ ] Generate outreach
   - [ ] Skeleton out action dropdown w/checklist items
   - [ ] Implement find emails for selected contacts

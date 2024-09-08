@@ -34,7 +34,7 @@ class ContactRow:
             Td(
                 ModalButton(
                     text="View Details",
-                    hx_get=f"/modal?job_id={0}&contact_id={1}",
+                    hx_get=f"/modal?job_id={self.job_opening.id}&contact_id={self.contact.id}",
                     data_modal_target="details-modal",
                     data_modal_show="details-modal",
                     hx_trigger="click",
