@@ -84,9 +84,9 @@ CUSTOM_HDRS = (
     # Script(src="https://unpkg.com/htmx.org@1.9.12"),
     # Ext
     # Script(src="https://unpkg.com/htmx.ext...chunked-transfer/dist/index.js"),
-    Script(
-        src="https://unpkg.com/htmx-ext-transfer-encoding-chunked@0.4.0/transfer-encoding-chunked.js"
-    ),
+    # Script(
+    #     src="https://unpkg.com/htmx-ext-transfer-encoding-chunked@0.4.0/transfer-encoding-chunked.js"
+    # ),
     # Script(
     #     src="https://unpkg.com/htmx-ext-transfer-encoding-chunked@0.2.0/transfer-encoding-chunked.js"
     # ),

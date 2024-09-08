@@ -34,13 +34,11 @@ class FindCareersPageTask(ActionEvent):
             Div(
                 ModalButton(
                     text="View Details",
-                    # hx_get=f"/modal?job_id={self.job_opening.id}&contact_id={self.contact.id}",
                     hx_get=f"/modal?job_id={0}&contact_id={1}",
                     data_modal_target="details-modal",
                     data_modal_show="details-modal",
-                    hx_swap="innerHTML",
-                    hx_target="#details-modal-body",
                     hx_trigger="click",
+                    hx_swap="none",
                 ),
                 "Found... ",
                 A(

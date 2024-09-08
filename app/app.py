@@ -16,7 +16,7 @@ from app.custom_hdrs import CUSTOM_HDRS, FLOWBITE_INCLUDE_SCRIPT
 from app.services.scraping_service import DummyScrapingService
 from app.services.serp_service import DummySearchService
 
-app = FastHTML(hdrs=CUSTOM_HDRS, live=True)
+app = FastHTML(hdrs=CUSTOM_HDRS, ct_hdr=True, live=True)
 
 agent = Agent(
     serp_service=DummySearchService(), scraping_service=DummyScrapingService()
@@ -45,10 +45,9 @@ def get():
                 search_input,
                 results,
             ),
-            Div("SUCK THIS", id="fuck_me"),
             ModalBody(
                 title="Contact Details",
-                body=Div("REPLACE THIS BODY????"),
+                body=Div("Old Content, this should be replaced with new content!"),
                 id="details-modal",
             ),
             cls="flex justify-center py-12",
@@ -65,20 +64,12 @@ def fetch_action_plan(company_name: str):
             hx_get=f"/modal?job_id={0}&contact_id={1}",
             data_modal_target="details-modal",
             data_modal_show="details-modal",
-            hx_swap="innerHTML",
-            hx_target="#details-modal-body",
+            # hx_swap="innerHTML",
+            hx_swap="none",
+            # hx_target="#details-modal-body",
             hx_trigger="click",
         ),
         Timeline(events=[], id="action_plan_timeline", company_name=company_name),
-        ModalButton(
-            text="View Details",
-            hx_get=f"/modal?job_id={0}&contact_id={1}",
-            data_modal_target="details-modal",
-            data_modal_show="details-modal",
-            hx_swap="innerHTML",
-            hx_target="#details-modal-body",
-            hx_trigger="click",
-        ),
     )
 
 
@@ -87,9 +78,10 @@ async def streaming_action_plan(
     company_name: str,
 ):
     response = StreamingResponse(
-        agent.find_company_information(company_name), media_type="text/html"
+        agent.find_company_information(company_name),
+        media_type="text/html",
+        headers={"X-Transfer-Encoding": "chunked"},
     )
-    response.headers["Transfer-Encoding"] = "chunked"
     return response
 
 
@@ -99,11 +91,11 @@ async def research_jobs(request: Request, company_name: str):
     form = await request.form()
     job_ids = cast(List[str], form.getlist("jobs[]"))
 
-    print("Finding information for jobs: ", job_ids)
     response = StreamingResponse(
-        agent.research_job_openings(job_ids), media_type="text/html"
+        agent.research_job_openings(job_ids),
+        media_type="text/html",
+        headers={"X-Transfer-Encoding": "chunked"},
     )
-    response.headers["Transfer-Encoding"] = "chunked"
     return response
 
 
@@ -112,14 +104,12 @@ async def render_contact_table(request: Request, company_name: str):
     # TODO: Don't do it this way
     form = await request.form()
     job_ids = cast(List[str], form.getlist("jobs[]"))
-    print(agent)
-    print(agent.openings)
 
-    print("Finding contacts for jobs: ", job_ids)
     response = StreamingResponse(
-        agent.find_contacts(agent.desired_job_openings), media_type="text/html"
+        agent.find_contacts(agent.desired_job_openings),
+        media_type="text/html",
+        headers={"X-Transfer-Encoding": "chunked"},
     )
-    response.headers["Transfer-Encoding"] = "chunked"
     return response
 
 
@@ -127,17 +117,7 @@ async def render_contact_table(request: Request, company_name: str):
 def modal(job_id: str, contact_id: str):
     job: Optional[JobOpening] = agent.get_job_opening(job_id)
     return Div(
-        "Job details for JOB",
+        f"Job details for JOB {job.id if job else "unknown"}",
+        hx_swap_oob="innerHTML:#details-modal-body",
         id="details-modal-body",
-        hx_debug="true",
     )
-    # return ModalBody(
-    #     title="Contact Details",
-    #     body=Div(
-    #         "Job details for {} - {}".format(
-    #             job.title if job else "Unknown", contact_id
-    #         ),
-    #         id="contact-details-modal-body",
-    #     ),
-    #     id="details-modal",
-    # )
