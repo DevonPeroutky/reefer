@@ -7,11 +7,10 @@ from app.components.events import (
     FindCareersPageTask,
     FindOpeningsPageTask,
 )
-from app.components.application.contact_table import ContactTable
 from app.services.serp_service import SearchService, SerpService
 from app.services.scraping_service import ScrapingService
-from app import Company, Contact, JobOpening
-from app.actions import BaseAction, TaskStatus, TaskType
+from app import Company
+from app.actions import BaseAction, TaskStatus
 
 
 class FindCompanyAction(BaseAction[Company]):

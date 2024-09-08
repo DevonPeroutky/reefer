@@ -9,7 +9,6 @@ from app.components.primitives.modal import (
     ModalButton,
 )
 from app.components.primitives.search_input import SearchInput
-from app.components.application.contact_table import ContactTable
 from app.components.application.timeline import Timeline
 from app.services.action_planner import Agent
 from app.custom_hdrs import CUSTOM_HDRS, FLOWBITE_INCLUDE_SCRIPT
@@ -58,18 +57,16 @@ def get():
 
 @app.post("/action_plan")
 def fetch_action_plan(company_name: str):
+    timeline_id = "action_plan_timeline"
     return Div(
-        ModalButton(
-            text="View Details",
-            hx_get=f"/modal?job_id={0}&contact_id={1}",
-            data_modal_target="details-modal",
-            data_modal_show="details-modal",
-            # hx_swap="innerHTML",
-            hx_swap="none",
-            # hx_target="#details-modal-body",
-            hx_trigger="click",
+        Div(
+            hx_post=f"/stream_action_plan?company_name={company_name}",
+            hx_trigger="load",
+            hx_target=f"#{timeline_id}",
+            hx_swap="beforeend",
+            hx_ext="chunked-transfer",
         ),
-        Timeline(events=[], id="action_plan_timeline", company_name=company_name),
+        Timeline(id=timeline_id, company_name=company_name),
     )
 
 

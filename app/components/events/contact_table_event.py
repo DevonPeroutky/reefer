@@ -7,8 +7,6 @@ from fasthtml.common import *
 from app import Company, Contact, JobOpening
 from typing import List, Tuple
 
-from app.components.primitives.modal import ModalButton
-
 
 class ContactTableEvent:
     def __init__(
@@ -34,16 +32,16 @@ class ContactTableEvent:
         return Li(
             TimelineEventStatusIndicator(self.status, self.id),
             Div(
+                hx_post=f"/stream_contacts?company_name={self.company.name}",
+                hx_trigger="load",
+                hx_target=f"#contacts-table",
+                hx_swap="beforeend",
+                hx_ext="chunked-transfer",
+                **{"hx-on:htmx:after-swap": "initFlowbite();"},
+            ),
+            Div(
                 ContactTable(company=self.company, job_contacts=self.job_contacts),
                 cls="w-full py-4 px-6 flex flex-col gap-y-3 bg-white border border-gray-200 rounded-lg shadow-sm dark:bg-gray-700 dark:border-gray-600",
-            ),
-            ModalButton(
-                text="View Details",
-                hx_get=f"/modal?job_id={0}&contact_id={1}",
-                data_modal_target="details-modal",
-                data_modal_show="details-modal",
-                hx_trigger="click",
-                hx_swap="none",
             ),
             cls=f"ms-6 flex items-start flex-col pl-2 {'hidden' if self.hidden else ''}",
             id=f"item-{self.id}",

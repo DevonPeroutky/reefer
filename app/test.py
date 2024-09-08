@@ -139,11 +139,16 @@ def get():
     page = Main()(
         Div(
             H1("Non-working modal example"),
+            ModalBody(
+                title="Contact Details",
+                body=Div("Old Content, this should be replaced with new content!"),
+                id="details-modal",
+            ),
             Div(
                 hx_get="/get-model-via-chunk",
                 hx_trigger="load",
                 # Uncommenting this will make the modal work
-                # hx_target="#non-working-modal",
+                hx_target="#non-working-modal",
                 hx_swap="beforeend",
                 hx_ext="chunked-transfer",
                 **{
@@ -161,11 +166,11 @@ def get():
 
 
 modal_items = [
-    ModalBody(
-        title="Contact Details",
-        body=Div("Old Content, this should be replaced with new content!"),
-        id="details-modal",
-    ),
+    # ModalBody(
+    #     title="Contact Details",
+    #     body=Div("Old Content, this should be replaced with new content!"),
+    #     id="details-modal",
+    # ),
     ModalButton(
         text="View Modal",
         hx_get="/modal-content",
