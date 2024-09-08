@@ -61,7 +61,7 @@ class SerpService(SearchService):
 class DummySearchService(SearchService):
     def find_careers_url(self, company: str) -> str:
 
-        time_to_sleep = random.randint(1, 8)
+        time_to_sleep = random.randint(1, 2)
         time.sleep(time_to_sleep)
 
         return f"https://www.{company}.com/careers"

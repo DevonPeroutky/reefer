@@ -57,6 +57,7 @@ class JobOpening:
 class Contact:
     name: str
     company: Company
+    linkedin_url: Optional[str] = None
     email: Optional[str] = None
     notes: Optional[str] = None
     job_title: Optional[str] = None

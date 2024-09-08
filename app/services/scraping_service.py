@@ -59,14 +59,6 @@ class ScrapingService(ABC):
     ) -> List[JobOpening]:
         pass
 
-
-class CareersPageScrapingService(ScrapingService):
-
-    def __init__(self):
-        anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
-        assert anthropic_api_key, "ANTHROPIC_API_KEY environment variable is not set."
-        self.client = Anthropic(api_key=anthropic_api_key)
-
     @staticmethod
     def strip_html(raw_html) -> str:
         soup = BeautifulSoup(raw_html, "html.parser")
@@ -149,6 +141,14 @@ class CareersPageScrapingService(ScrapingService):
 
         return page_source
 
+
+class CareersPageScrapingService(ScrapingService):
+
+    def __init__(self):
+        anthropic_api_key = os.getenv("ANTHROPIC_API_KEY")
+        assert anthropic_api_key, "ANTHROPIC_API_KEY environment variable is not set."
+        self.client = Anthropic(api_key=anthropic_api_key)
+
     def create_message(
         self, prompt, system_prompt, model, temperature, max_tokens
     ) -> str:
@@ -218,18 +218,6 @@ class CareersPageScrapingService(ScrapingService):
     def find_query_terms_from_job_description(
         self, job_opening: JobOpening
     ) -> Dict[str, List[str]]:
-        # Sleep for 3 seconds to simulate a long running task
-        # time.sleep(3)
-
-        # return {
-        #     "keywords": ["Python", "Django", "React", "GraphQL"],
-        #     "positions": [
-        #         "Engineering Manager",
-        #         "Software Engineering",
-        #         "Technical Lead",
-        #     ],
-        # }
-
         raw_html = ScrapingService.get_page_source(job_opening.link)
         cleaned_html = str(ScrapingService.strip_html(raw_html))
 
@@ -253,7 +241,7 @@ class CareersPageScrapingService(ScrapingService):
 class DummyScrapingService(ScrapingService):
 
     def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
-        time_to_sleep = random.randint(1, 8)
+        time_to_sleep = random.randint(1, 2)
         time.sleep(time_to_sleep)
 
         return f"https://www.{company}.com/careers"
@@ -261,7 +249,7 @@ class DummyScrapingService(ScrapingService):
     def find_query_terms_from_job_description(
         self, job_opening: JobOpening
     ) -> Dict[str, List[str]]:
-        time_to_sleep = random.randint(1, 8)
+        time_to_sleep = random.randint(1, 2)
         time.sleep(time_to_sleep)
         return {
             "keywords": ["Python", "Django", "React", "GraphQL"],
@@ -273,7 +261,7 @@ class DummyScrapingService(ScrapingService):
         }
 
     def parse_openings_from_link(self, job_type, company: Company) -> List[JobOpening]:
-        time_to_sleep = random.randint(1, 8)
+        time_to_sleep = random.randint(1, 2)
         time.sleep(time_to_sleep)
 
         return test_openings

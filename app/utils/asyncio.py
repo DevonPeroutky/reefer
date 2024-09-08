@@ -3,7 +3,10 @@ from typing import AsyncIterator
 
 
 async def combine_generators(*generators: AsyncIterator) -> AsyncIterator:
-    tasks = {asyncio.create_task(anext(gen, None)): gen for gen in generators}
+    tasks = {
+        asyncio.create_task(coro=anext(gen, None), name=f"Task {idx}"): gen
+        for idx, gen in enumerate(generators)
+    }
 
     while tasks:
         # Wait for the first task to complete and yield the result
@@ -12,9 +15,12 @@ async def combine_generators(*generators: AsyncIterator) -> AsyncIterator:
             if (result := task.result()) is not None:
                 yield result
 
+            print("Evaluating task lifecyle...")
             generator = tasks.pop(task)
 
             if result and generator:
-                next_task = asyncio.create_task(anext(generator, None))
+                next_task = asyncio.create_task(
+                    coro=anext(generator, None), name=task.get_name()
+                )
                 print("Rescheduling next_task ", next_task)
                 tasks[next_task] = generator

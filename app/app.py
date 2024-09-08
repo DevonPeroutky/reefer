@@ -76,13 +76,17 @@ async def research_jobs(request: Request, company_name: str):
     return response
 
 
-@app.post("/contacts_table")
+@app.post("/stream_contacts")
 async def render_contact_table(request: Request, company_name: str):
     # TODO: Don't do it this way
     form = await request.form()
     job_ids = cast(List[str], form.getlist("jobs[]"))
+    print(agent)
+    print(agent.openings)
 
     print("Finding contacts for jobs: ", job_ids)
-    response = StreamingResponse(agent.find_contacts(job_ids), media_type="text/html")
+    response = StreamingResponse(
+        agent.find_contacts(agent.desired_job_openings), media_type="text/html"
+    )
     response.headers["Transfer-Encoding"] = "chunked"
     return response

@@ -26,17 +26,19 @@ class ResearchJobAction(BaseAction[JobOpening]):
         # TODO: Yield a Job Description loading event
         parse_job_description = ParseJobDescriptionEvent(self.job_opening)
         yield to_xml(parse_job_description)
-        await asyncio.sleep(1)
+        await asyncio.sleep(0.1)
 
-        print(f"Searching for query terms for ", (self.job_opening))
-        res = self.scraping_service.find_query_terms_from_job_description(
-            self.job_opening
+        print(
+            f"Searching for query terms for ",
+            (self.job_opening),
+            "in a seperate thread...",
+        )
+        res = await asyncio.to_thread(
+            self.scraping_service.find_query_terms_from_job_description,
+            self.job_opening,
         )
         keywords = res.get("keywords", [])
         positions = res.get("positions", [])
-
-        print("Keywords: ", keywords)
-        print("Positions: ", positions)
 
         parse_job_description.complete_task(keywords=keywords, positions=positions)
         self.job_opening.keywords = keywords

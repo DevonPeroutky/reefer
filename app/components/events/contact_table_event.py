@@ -11,6 +11,7 @@ from typing import List, Tuple
 class ContactTableEvent:
     def __init__(
         self,
+        id: str,
         company: Company,
         job_contacts: List[Tuple[JobOpening, Contact]],
         hidden: bool = False,
@@ -19,7 +20,7 @@ class ContactTableEvent:
         self.company = company
         self.status = TaskStatus.IN_PROGRESS
         self.hidden = hidden
-        self.id = "contact-table"
+        self.id = id
         self.kwargs = kwargs
         self.job_contacts = job_contacts
 
@@ -28,7 +29,6 @@ class ContactTableEvent:
         self.job_contacts = job_contacts
 
     def __ft__(self):
-        print("RENDERING CONTACT TABLE: ", self.job_contacts)
         return Li(
             TimelineEventStatusIndicator(self.status, self.id),
             Div(

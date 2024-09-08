@@ -3,8 +3,9 @@ import asyncio
 from typing import List, Optional, AsyncGenerator, Any
 from fasthtml.common import Safe, to_xml
 
+from app.actions import TaskStatus
+from app.components.application.timeline_status_indicator import TimelineEventStatusIndicator
 from app.components.events.contact_table_event import ContactTableEvent
-from app.components.events.parse_job_description_event import ParseJobDescriptionEvent
 from app.stub_data import spotter, spotter_openings
 from app.actions.find_company_action import FindCompanyAction
 from app.actions.parse_openings_action import ParseOpeningsAction
@@ -12,8 +13,37 @@ from app.actions.find_contacts_action import FindContactsAction
 from app import Company, Contact, JobOpening
 from app.actions.research_job_action import ResearchJobAction
 from app.services.serp_service import SearchService, SerpService
-from app.services.scraping_service import ScrapingService
+from app.services.scraping_service import CareersPageScrapingService, ScrapingService
 from app.utils.asyncio import combine_generators
+
+
+"""
+Finding contacts for a company is essentially a multi-step process of...
+
+/find_company_information -> /parse_openings -> /research_job_openings -> /find_contacts
+
+
+
+
+1. /find_company_information
+    # FindCompanyAction
+    a. Finding the company's career page
+    b. Finding the page that lists the job openings (which may or may not be the same as the career page)
+
+    # ParseOpeningsAction
+    c. Parsing the job openings into a structured list of JobOpening's
+
+2. /parse_openings
+    # ResearchJobAction 
+    a. Allow user to select which jobs they are interested in
+    b. For each job, parse the job description to find relevant keywords and positions that can be used to find contacts
+
+3. /find_contacts
+    # FindContactsAction
+    a. Use the keywords and positions to find linkedin profiles most relevant to each job opening
+    b. Use getprospect API to find emails for each linkedin profile
+
+"""
 
 
 class Agent:
@@ -23,10 +53,11 @@ class Agent:
         scraping_service: Optional[ScrapingService] = None,
     ):
         self.serp_service = serp_service or SerpService()
-        self.scraping_service = scraping_service or ScrapingService()
+        self.scraping_service = scraping_service or CareersPageScrapingService()
 
         self.company: Optional[Company] = None
         self.openings: List[JobOpening] = []
+        self.desired_job_openings: List[JobOpening] = []
         self.contacts: List[Contact] = []
 
     async def find_company_information(self, company_name: str):
@@ -60,49 +91,42 @@ class Agent:
 
     async def research_job_openings(self, job_ids: List[str]):
         openings = self.openings or spotter_openings
-        # assert self.company, "Company is not determined?"
 
-        # TODO: REMOVE THIS OR
-        desired_job_openings = (
-            list(filter(lambda job: job.id in job_ids, openings)) or spotter_openings
+        self.desired_job_openings: List[JobOpening] = (
+            list(filter(lambda job: job.id in job_ids, openings))
         )
-        print("Desired Job Openings: ", desired_job_openings)
+        print("Desired Job Openings: ", self.desired_job_openings)
 
-        generators = [
+        research_job_tasks = [
             ResearchJobAction(
                 job_opening=job, scraping_service=self.scraping_service
             ).yield_action_stream()
-            for job in desired_job_openings
+            for job in self.desired_job_openings
         ]
 
-        # WHY ARE "CONNECTIONS" STILL OPEN?
-        async for res in combine_generators(*generators):
+        async for res in combine_generators(*research_job_tasks):
             yield res
+            await asyncio.sleep(0.1)
 
-        print("YIELDing the TABLE")
-        # Yield the (empty) contact_table
         contact_table = ContactTableEvent(
+            id="contact-table",
             company=self.company or spotter, job_contacts=[]
         )
         yield to_xml(contact_table)
         # await asyncio.sleep(0.1)
 
-    async def find_contacts(self, job_ids: List[str]):
+    async def find_contacts(self, job_openings: List[JobOpening]):
         assert self.company, "Company is not determined?"
 
-        desired_job_openings = list(
-            filter(lambda job: job.id in job_ids, self.openings)
-        )
-        print("Desired Job Openings: ", desired_job_openings)
+        find_contacts_tasks = [
+            FindContactsAction(
+                serp_service=self.serp_service,
+                scraping_service=self.scraping_service,
+            ).yield_action_stream(job)
+            for job in job_openings
+        ]
 
-        find_contacts_action = FindContactsAction(
-            company=self.company,
-            job_type="Software Engineer",
-            serp_service=self.serp_service,
-            scraping_service=self.scraping_service,
-        )
+        async for res in combine_generators(*find_contacts_tasks):
+            yield res
+            await asyncio.sleep(0.1)
 
-        async for event in find_contacts_action.yield_action_stream(
-            desired_job_openings
-        ):
-            yield event
