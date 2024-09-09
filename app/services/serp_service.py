@@ -31,8 +31,11 @@ class SerpService(SearchService):
     def _search(self, query: str):
         payload = {"api_key": self.api_key, "q": query, "gl": "us"}
         resp = requests.get("https://api.serpdog.io/search", params=payload)
+        print(resp)
         if resp.status_code != 200:
-            raise Exception("Failed to fetch search results. Error: ", resp.status_code)
+            raise Exception(
+                "Failed to fetch search results. Error: ", resp.status_code, resp.reason
+            )
         return resp.text
 
     def find_careers_url(self, company: str) -> str:
@@ -49,12 +52,16 @@ class SerpService(SearchService):
 
         # time.sleep(1)
         #
-        query = "{} {} {}".format(
+        query = "site:linkedin.com/in {} {} {}".format(
             company, " ".join(keywords), " ".join(targetted_roles)
         )
+        print("Search QUERY: ", query)
         res = self._search(query)
         results = json.loads(res)["organic_results"]
         print("Search Results: ", results)
+
+        # CONVERT SERACH RESULTS TO CONTACTS
+
         return results
 
 

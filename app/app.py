@@ -17,9 +17,10 @@ from app.services.serp_service import DummySearchService
 
 app = FastHTML(hdrs=CUSTOM_HDRS, ct_hdr=True, live=True)
 
-agent = Agent(
-    serp_service=DummySearchService(), scraping_service=DummyScrapingService()
-)
+# agent = Agent(
+#     serp_service=DummySearchService(), scraping_service=DummyScrapingService()
+# )
+agent = Agent()
 
 
 @app.route("/")
@@ -100,7 +101,6 @@ async def research_jobs(request: Request, company_name: str):
 async def render_contact_table(request: Request, company_name: str):
     # TODO: Don't do it this way
     form = await request.form()
-    job_ids = cast(List[str], form.getlist("jobs[]"))
 
     response = StreamingResponse(
         agent.find_contacts(agent.desired_job_openings),

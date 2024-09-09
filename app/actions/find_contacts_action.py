@@ -24,7 +24,7 @@ class FindContactsAction(BaseAction[List[Contact]]):
     async def yield_action_stream(self, job: JobOpening) -> AsyncGenerator[Safe, None]:
 
         print(
-            f"Searching for contacts for {job.title} using {job.keywords} and {job.positions}"
+            f"Searching for contacts at {job.company.name} for {job.title} using {job.keywords} and {job.positions}"
         )
 
         contacts = await asyncio.to_thread(
