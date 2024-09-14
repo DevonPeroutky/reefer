@@ -10,6 +10,11 @@
   - [ ] Skeleton out action dropdown w/checklist items
   - [ ] Implement find emails for selected contacts
 
+## Issues
+- [ ] Certain companies have custom/unique openings page (once they get big enough)
+  - [ ] Snap, Meta, etc, have their own portal
+  - [ ] Anduril, Datadog have a giant paginated list --> Handle pagination
+
 # Milestone 2 - Persistence
 - [ ] Persist results to Database
   - [ ] Companies
