@@ -33,15 +33,11 @@ class ActionEvent(Generic[T]):
         return self.knowledge_service.get_current_state()
 
     @abstractmethod
-    def execute_task(self, state: AgentState):
+    async def execute_task(self, state: AgentState):
         pass
 
     def _prepare_for_dom_update(self):
         self.kwargs["hx_swap_oob"] = "true"
-
-    @abstractmethod
-    def yield_final_result(self) -> T:
-        pass
 
     def complete_task(self, *args, **kwargs):
         self.status = TaskStatus.COMPLETED

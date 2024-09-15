@@ -70,7 +70,7 @@ class Agent:
         await asyncio.sleep(0.0)
 
         # Execute Task
-        task.execute_task(self.knowledge_service.get_current_state())
+        await task.execute_task(self.knowledge_service.get_current_state())
 
         # Re-render completed event to client
         yield to_xml(task)
@@ -117,7 +117,6 @@ class Agent:
         for task in tasks:
             async for res in self.execute_task(task):
                 yield res
-                await asyncio.sleep(0.0)
 
     def get_job_opening(self, job_id: str) -> Optional[JobOpening]:
         openings = self.knowledge_service.get_current_state().job_openings
@@ -153,8 +152,9 @@ class Agent:
         )
         yield to_xml(contact_table)
 
+    # TODO: Move to a separate task
     async def find_contacts_for_opening(self, job_opening: JobOpening):
-        contacts: List[Contact] = self.serp_service.find_list_of_contacts(
+        contacts: List[Contact] = await self.serp_service.find_list_of_contacts(
             job_opening.company, job_opening.keywords, job_opening.positions
         )
         print("---------" * 5)
@@ -163,50 +163,18 @@ class Agent:
             yield to_xml(contact_row)
             await asyncio.sleep(1)
 
-    async def _find_contacts(self, job_openings: List[JobOpening]):
-        async_tasks = [
-            asyncio.to_thread(
-                self.find_contacts_for_opening,
-                job,
-            )
-            for job in job_openings
-        ]
-        print("ASYNC TASKS: ", async_tasks)
-
-        # Iterate over tasks as they complete using asyncio.as_completed
-        for coro in asyncio.as_completed(async_tasks):
-            res = await coro
-            yield to_xml(res)
-
     async def find_contacts(self):
         agent_state = self.knowledge_service.get_current_state()
         assert (
             agent_state.desired_job_openings
         ), "Desired job openings must be set in the state before executing this task"
 
-        async for res in self._find_contacts(agent_state.desired_job_openings):
-            yield res
-            await asyncio.sleep(0.0)
-
-        yield to_xml(
-            SuccessIcon(
-                id=f"contact-table-loader",
-                hx_swap_oob="outerHTML:#contact-table-loader",
-            )
-        )
-        await asyncio.sleep(0.0)
-
-    async def find_contacts_old(self, job_openings: List[JobOpening]):
-
-        find_contacts_tasks = [
-            FindContactsAction(
-                serp_service=self.serp_service,
-                scraping_service=self.scraping_service,
-            ).yield_action_stream(job)
-            for job in job_openings
+        tasks = [
+            self.find_contacts_for_opening(job)
+            for job in agent_state.desired_job_openings
         ]
 
-        async for res in combine_generators(*find_contacts_tasks):
+        async for res in combine_generators(*tasks):
             yield res
             await asyncio.sleep(0.1)
 
@@ -216,4 +184,4 @@ class Agent:
                 hx_swap_oob="outerHTML:#contact-table-loader",
             )
         )
-        await asyncio.sleep(0.1)
+        await asyncio.sleep(0.0)

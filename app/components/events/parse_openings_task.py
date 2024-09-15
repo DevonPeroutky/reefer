@@ -29,12 +29,12 @@ class ParseOpeningsTask(ActionEvent):
         )
         self.scraping_service = scraping_service or CareersPageScrapingService()
 
-    def execute_task(self, state: AgentState):
+    async def execute_task(self, state: AgentState):
         assert (
             state.company
         ), "Company must be set in the state before executing this task"
 
-        job_openings = self.scraping_service.parse_openings_from_link(
+        job_openings = await self.scraping_service.parse_openings_from_link(
             company=state.company,
             job_type=state.desired_job_type,
         )

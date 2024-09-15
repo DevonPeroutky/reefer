@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import os
 import requests
 import json
+import asyncio
 
 from fasthtml.common import List
 
@@ -10,11 +11,11 @@ from app import Company, Contact
 
 class SearchService(ABC):
     @abstractmethod
-    def find_careers_url(self, company: str) -> str:
+    async def find_careers_url(self, company: str) -> str:
         pass
 
     @abstractmethod
-    def find_list_of_contacts(
+    async def find_list_of_contacts(
         self, company: Company, keywords: List[str], targetted_roles: List[str]
     ) -> List[Contact]:
         pass
@@ -35,15 +36,15 @@ class SerpService(SearchService):
             )
         return resp.text
 
-    def find_careers_url(self, company: str) -> str:
+    async def find_careers_url(self, company: str) -> str:
         query = "{} careers".format(company)
-        res = self._search(query)
+        res = await asyncio.to_thread(self._search, query)
         results = json.loads(res)["organic_results"]
         # print("Search Results: ", results)
 
         return results[0]["link"]
 
-    def find_list_of_contacts(
+    async def find_list_of_contacts(
         self, company: Company, keywords: List[str], targetted_roles: List[str]
     ) -> List[Contact]:
 
@@ -51,10 +52,9 @@ class SerpService(SearchService):
             company, " ".join(keywords), " ".join(targetted_roles)
         )
         print("Search QUERY: ", query)
-        res = self._search(query)
+        res = await asyncio.to_thread(self._search, query)
         results = json.loads(res)["organic_results"]
         print("Search Results: ", results)
 
         # CONVERT SERACH RESULTS TO CONTACTS
-
         return results

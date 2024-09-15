@@ -1,3 +1,4 @@
+import asyncio
 import random
 import time
 
@@ -9,35 +10,29 @@ from app.stub.data import test_contacts, test_openings
 
 
 class DummySearchService(SearchService):
-    def find_careers_url(self, company: str) -> str:
-
-        time_to_sleep = random.randint(1, 2)
-        time.sleep(time_to_sleep)
+    async def find_careers_url(self, company: str) -> str:
+        await asyncio.sleep(1)
 
         return f"https://www.{company}.com/careers"
 
-    def find_list_of_contacts(
+    async def find_list_of_contacts(
         self, company: Company, keywords: List[str], targetted_roles: List[str]
     ) -> List[Contact]:
-        time_to_sleep = random.randint(1, 3)
-        time.sleep(time_to_sleep)
-
+        await asyncio.sleep(1)
         return test_contacts
 
 
 class DummyScrapingService(ScrapingService):
 
-    def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
-        time_to_sleep = random.randint(1, 2)
-        time.sleep(time_to_sleep)
+    async def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
 
+        await asyncio.sleep(1)
         return f"https://www.{company}.com/careers"
 
-    def find_query_terms_from_job_description(
+    async def find_query_terms_from_job_description(
         self, job_opening: JobOpening
     ) -> Dict[str, List[str]]:
-        time_to_sleep = random.randint(1, 2)
-        time.sleep(time_to_sleep)
+        await asyncio.sleep(1)
         return {
             "keywords": ["Python", "Django", "React", "GraphQL"],
             "positions": [
@@ -47,8 +42,9 @@ class DummyScrapingService(ScrapingService):
             ],
         }
 
-    def parse_openings_from_link(self, job_type, company: Company) -> List[JobOpening]:
-        time_to_sleep = random.randint(1, 2)
-        time.sleep(time_to_sleep)
+    async def parse_openings_from_link(
+        self, job_type, company: Company
+    ) -> List[JobOpening]:
+        await asyncio.sleep(1)
 
         return test_openings

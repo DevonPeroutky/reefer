@@ -24,11 +24,12 @@ class FindCareersPageTask(ActionEvent[str]):
         )
         self.serp_service: SearchService = serp_service or SerpService()
 
-    def execute_task(self, state: AgentState):
+    async def execute_task(self, state: AgentState):
         assert (
             state.company
         ), "Company must be set in the state before executing this task"
-        careers_page_url = self.serp_service.find_careers_url(state.company.name)
+        print(self.serp_service.find_careers_url(state.company.name))
+        careers_page_url = await self.serp_service.find_careers_url(state.company.name)
 
         # Update the company state with the careers page link
         state.company.careers_link = careers_page_url

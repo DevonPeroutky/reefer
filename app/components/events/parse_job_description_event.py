@@ -35,13 +35,15 @@ class ParseJobDescriptionTask(ActionEvent):
         )
         self.job = job
 
-    def execute_task(self, state: AgentState):
+    async def execute_task(self, state: AgentState):
         print(
             f"Searching for query terms for ",
             (self.job),
             "in a seperate thread...",
         )
-        res = self.scraping_service.find_query_terms_from_job_description(self.job)
+        res = await self.scraping_service.find_query_terms_from_job_description(
+            self.job
+        )
         keywords = res.get("keywords", [])
         positions = res.get("positions", [])
         self.job.keywords = keywords

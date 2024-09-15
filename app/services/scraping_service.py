@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import asyncio
 import json
 import os
 from fasthtml.common import dataclass
@@ -41,17 +42,17 @@ The two list should be returned as a JSON with the keys "keywords" and "position
 
 class ScrapingService(ABC):
     @abstractmethod
-    def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
+    async def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
         pass
 
     @abstractmethod
-    def find_query_terms_from_job_description(
+    async def find_query_terms_from_job_description(
         self, job_opening: JobOpening
     ) -> Dict[str, List[str]]:
         pass
 
     @abstractmethod
-    def parse_openings_from_link(
+    async def parse_openings_from_link(
         self, job_type: str, company: Company
     ) -> List[JobOpening]:
         pass
@@ -158,7 +159,7 @@ class CareersPageScrapingService(ScrapingService):
         )
         return message.content[0].text
 
-    def parse_openings_from_link(
+    async def parse_openings_from_link(
         self,
         job_type: str,
         company: Company,
@@ -166,7 +167,9 @@ class CareersPageScrapingService(ScrapingService):
         print(
             f"Parsing {job_type} openings for {company.name} from {company.opening_link}."
         )
-        openings_page_source = self.get_page_source(company.opening_link)
+        openings_page_source = await asyncio.to_thread(
+            self.get_page_source, company.opening_link
+        )
         cleaned_html = str(ScrapingService.strip_html(openings_page_source))
         print(
             f"Reduce the HTML context payload from {len(openings_page_source)} --> {len(cleaned_html)}"
@@ -174,14 +177,14 @@ class CareersPageScrapingService(ScrapingService):
 
         parse_opening_prompt = PARSE_OPENINGS_PROMPT.format(company.name, job_type)
         prompt = f"{cleaned_html}\n\n {parse_opening_prompt}"
-        text_responses = self.create_message(
+        text_responses = await asyncio.to_thread(
+            self.create_message,
             PARSE_HTML_SYSTEM_PROMPT,
             prompt,
             model="claude-3-5-sonnet-20240620",
             temperature=0.1,
             max_tokens=4096,
         )
-        print(text_responses)
         json_response = json.loads(text_responses)
         print(json_response)
         job_openings = [
@@ -190,14 +193,15 @@ class CareersPageScrapingService(ScrapingService):
         ]
         return job_openings
 
-    def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
+    async def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
         print(f"Parsing openings page link from {link} for {company}")
         raw_html = ScrapingService.get_page_source(link)
         links = self.fetch_all_links_from_webpage(raw_html)
         print("LInks: ", links)
         prompt = PARSE_OPENINGS_LINK_PROMPT.format(company, links)
         print(prompt)
-        openings_link = self.create_message(
+        openings_link = await asyncio.to_thread(
+            self.create_message,
             PARSE_HTML_SYSTEM_PROMPT,
             prompt,
             model="claude-3-5-sonnet-20240620",
@@ -212,7 +216,7 @@ class CareersPageScrapingService(ScrapingService):
             else None
         )
 
-    def find_query_terms_from_job_description(
+    async def find_query_terms_from_job_description(
         self, job_opening: JobOpening
     ) -> Dict[str, List[str]]:
         raw_html = ScrapingService.get_page_source(job_opening.link)
@@ -222,7 +226,8 @@ class CareersPageScrapingService(ScrapingService):
             job_opening.title, job_opening.company, job_opening.company
         )
         prompt = f"{cleaned_html}\n\n {parse_query_terms_prompt}"
-        text_responses = self.create_message(
+        text_responses = await asyncio.to_thread(
+            self.create_message,
             PARSE_HTML_SYSTEM_PROMPT,
             prompt,
             model="claude-3-5-sonnet-20240620",

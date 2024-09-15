@@ -26,13 +26,13 @@ class FindOpeningsPageTask(ActionEvent[Company]):
             scraping_service or CareersPageScrapingService()
         )
 
-    def execute_task(self, state: AgentState):
+    async def execute_task(self, state: AgentState):
         assert (
             state and state.company and state.company.careers_link
         ), "Company must be set in the state before executing this task"
 
         openings_page_url = (
-            self.scraping_service.find_openings_page_link(
+            await self.scraping_service.find_openings_page_link(
                 link=state.company.careers_link, company=state.company.name
             )
             or state.company.careers_link
