@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from uuid import uuid4
-from typing import Optional, Generic, TypeVar
+from typing import AsyncGenerator, Optional, Generic, TypeVar
 from fasthtml.common import *
 from app.agent import AgentState
 
@@ -74,3 +74,9 @@ class ActionEvent(Generic[T]):
             id=f"item-{self.id}",
             **self.kwargs,
         )
+
+
+class StreamingActionEvent(ActionEvent):
+    @abstractmethod
+    def execute_streaming_task(self, *args, **kwargs) -> AsyncGenerator[str, None]:
+        pass

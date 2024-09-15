@@ -146,11 +146,12 @@ test_contacts = [
         company=brex,
         id=str(uuid4()),
     ),
-    # Contact(
-    #     name="Jane Smith",
-    #     job_title="Engineering Manager",
-    #     location="San Francisco",
-    #     email="",
-    #     company=brex,
-    # ),
+    Contact(
+        name="Sally Smith",
+        job_title="Product Manager",
+        location="Portland",
+        email="sally@brex.com",
+        company=brex,
+        id=str(uuid4()),
+    ),
 ]

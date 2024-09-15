@@ -12,7 +12,7 @@ from app.components.events.find_openings_page_task import FindOpeningsPageTask
 from app.components.events.parse_openings_task import ParseOpeningsTask
 from app.stub.data import spotter_openings, spotter
 from app.agent import AgentState
-from app.components.events.action_event import ActionEvent
+from app.components.events.action_event import ActionEvent, StreamingActionEvent
 from app.components.events.contact_table_event import ContactTableEvent
 from app.components.primitives.success_icon import SuccessIcon
 from app.actions.find_company_action import FindCompanyAction
@@ -76,6 +76,13 @@ class Agent:
         # Re-render completed event to client
         yield to_xml(task)
         await asyncio.sleep(0.0)
+
+    async def execute_streaming_task(self, task: StreamingActionEvent):
+        res = task.execute_streaming_task(self.knowledge_service.get_current_state())
+
+        async for r in res:
+            yield to_xml(r)
+            await asyncio.sleep(0.0)
 
     async def execute_tasks_sequentially(self, tasks: List[ActionEvent]):
         for task in tasks:
@@ -142,7 +149,7 @@ class Agent:
             *[self.execute_task(task) for task in research_job_tasks]
         ):
             yield res
-            await asyncio.sleep(0.1)
+            await asyncio.sleep(0)
 
         contact_table = ContactTableEvent(
             id="contact-table", company=agent_state.company, job_contacts=[]
@@ -150,7 +157,9 @@ class Agent:
         yield to_xml(contact_table)
 
     # TODO: Move to a separate task
-    async def find_contacts_for_opening(self, job_opening: JobOpening):
+    async def find_contacts_for_opening(
+        self, job_opening: JobOpening
+    ) -> AsyncGenerator[str, None]:
         contacts: List[Contact] = await self.serp_service.find_list_of_contacts(
             job_opening.company, job_opening.keywords, job_opening.positions
         )
@@ -166,30 +175,19 @@ class Agent:
             agent_state.desired_job_openings
         ), "Desired job openings must be set in the state before executing this task"
 
-        # Execute tasks concurrently and yield results as they complete
-        # tasks = [
-        #     FindContactTask(
-        #         job_opening=job,
-        #         serp_service=self.serp_service,
-        #         knowledge_service=self.knowledge_service,
-        #     )
-        #     for job in agent_state.desired_job_openings
-        # ]
-        # async for res in combine_generators(
-        #     *[self.execute_task(task) for task in tasks]
-        # ):
-        #     print("Yielding result: ", res)
-        #     yield res
-        #     await asyncio.sleep(0.0)
-
         tasks = [
-            self.find_contacts_for_opening(job)
+            FindContactTask(
+                job_opening=job,
+                serp_service=self.serp_service,
+                knowledge_service=self.knowledge_service,
+            )
             for job in agent_state.desired_job_openings
         ]
-
-        async for res in combine_generators(*tasks):
-            yield res
-            await asyncio.sleep(0.1)
+        async for res in combine_generators(
+            *[self.execute_streaming_task(task) for task in tasks]
+        ):
+            yield to_xml(res)
+            await asyncio.sleep(0.0)
 
         yield to_xml(
             SuccessIcon(

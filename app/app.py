@@ -6,7 +6,6 @@ from starlette.responses import StreamingResponse
 from app import JobOpening
 from app.components.primitives.modal import (
     ModalBody,
-    ModalButton,
 )
 from app.components.primitives.search_input import SearchInput
 from app.components.application.timeline import Timeline
@@ -112,6 +111,8 @@ async def render_contact_table(request: Request, company_name: str):
 @app.get("/modal")
 def modal(job_id: str, contact_id: str):
     job: Optional[JobOpening] = agent.knowledge_service.get_job_opening(job_id)
+    print(agent.knowledge_service.get_current_state().job_openings)
+    print("Job: ", job)
     return Div(
         f"Job details for JOB {job.id if job else "unknown"}",
         hx_swap_oob="innerHTML:#details-modal-body",
