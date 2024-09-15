@@ -7,6 +7,7 @@ from app import agent
 from app.agent.knowledge_service import KnowledgeService
 from app.components.application.contact_table import ContactRow
 from app.components.events import FindCareersPageTask, ParseJobDescriptionTask
+from app.components.events.find_contact_task import FindContactTask
 from app.components.events.find_openings_page_task import FindOpeningsPageTask
 from app.components.events.parse_openings_task import ParseOpeningsTask
 from app.stub.data import spotter_openings, spotter
@@ -118,10 +119,6 @@ class Agent:
             async for res in self.execute_task(task):
                 yield res
 
-    def get_job_opening(self, job_id: str) -> Optional[JobOpening]:
-        openings = self.knowledge_service.get_current_state().job_openings
-        return next(filter(lambda job: job.id == job_id, openings), None)
-
     async def research_job_openings(self, job_ids: List[str]):
         agent_state = self.knowledge_service.get_current_state()
         assert (
@@ -168,6 +165,22 @@ class Agent:
         assert (
             agent_state.desired_job_openings
         ), "Desired job openings must be set in the state before executing this task"
+
+        # Execute tasks concurrently and yield results as they complete
+        # tasks = [
+        #     FindContactTask(
+        #         job_opening=job,
+        #         serp_service=self.serp_service,
+        #         knowledge_service=self.knowledge_service,
+        #     )
+        #     for job in agent_state.desired_job_openings
+        # ]
+        # async for res in combine_generators(
+        #     *[self.execute_task(task) for task in tasks]
+        # ):
+        #     print("Yielding result: ", res)
+        #     yield res
+        #     await asyncio.sleep(0.0)
 
         tasks = [
             self.find_contacts_for_opening(job)

@@ -1,7 +1,7 @@
 import asyncio
 from typing import Optional
 from app.components.events.action_event import ActionEvent
-from services.serp_service import SearchService, SerpService
+from app.services.serp_service import SearchService, SerpService
 from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
 from app.components.primitives.tag import CompanyTag
@@ -27,7 +27,7 @@ class FindContactTask(ActionEvent):
             **kwargs,
         )
         self.job_opening = job_opening
-        self.contact: List[Contact] = []
+        self.contacts: List[Contact] = []
         self.serp_service: SearchService = serp_service or SerpService()
 
     async def execute_task(self, state: AgentState):
@@ -46,6 +46,8 @@ class FindContactTask(ActionEvent):
         super().complete_task()
 
     def __ft__(self):
-        return [
-            to_xml(ContactRow(self.job_opening, contact)) for contact in self.contacts
-        ]
+        contacts = [ContactRow(self.job_opening, contact) for contact in self.contacts]
+        print("CONTACTS -------------------")
+        print(contacts)
+        print([to_xml(c) for c in contacts])
+        return Td(*contacts)

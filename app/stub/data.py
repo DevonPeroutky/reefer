@@ -1,4 +1,5 @@
 from app import Company, JobOpening, Contact
+from uuid import uuid4
 
 brex = Company(
     name="Brex",
@@ -143,6 +144,7 @@ test_contacts = [
         location="San Francisco",
         email="pedro@brex.com",
         company=brex,
+        id=str(uuid4()),
     ),
     # Contact(
     #     name="Jane Smith",

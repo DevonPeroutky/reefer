@@ -111,7 +111,7 @@ async def render_contact_table(request: Request, company_name: str):
 
 @app.get("/modal")
 def modal(job_id: str, contact_id: str):
-    job: Optional[JobOpening] = agent.get_job_opening(job_id)
+    job: Optional[JobOpening] = agent.knowledge_service.get_job_opening(job_id)
     return Div(
         f"Job details for JOB {job.id if job else "unknown"}",
         hx_swap_oob="innerHTML:#details-modal-body",

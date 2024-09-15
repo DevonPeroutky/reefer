@@ -21,12 +21,12 @@ async def combine_generators(*generators: AsyncIterator) -> AsyncIterator:
                 print(f"TASK {task.get_name()} FINISHED ")
                 yield result
 
-            print("Evaluating task lifecyle...: ", tasks)
+            # print("Evaluating task lifecyle...: ", tasks)
             generator = tasks.pop(task)
 
             if result and generator:
                 next_task = asyncio.create_task(
                     coro=anext(generator, None), name=task.get_name()
                 )
-                print("Rescheduling next_task ", next_task)
+                # print("Rescheduling next_task ", next_task)
                 tasks[next_task] = generator
