@@ -74,8 +74,8 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/noarch/ptyprocess-0.7.0-pyhd3deb0d_0.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/noarch/pure_eval-0.2.3-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pycparser-2.22-pyhd8ed1ab_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/noarch/pydantic-2.8.2-pyhd8ed1ab_0.conda
-      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/pydantic-core-2.20.1-py312h552d48e_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/noarch/pydantic-2.9.1-pyhd8ed1ab_0.conda
+      - conda: https://conda.anaconda.org/conda-forge/osx-arm64/pydantic-core-2.23.3-py312he431725_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pygments-2.18.0-pyhd8ed1ab_0.conda
       - conda: https://conda.anaconda.org/conda-forge/noarch/pysocks-1.7.1-pyha2e5f31_6.tar.bz2
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/python-3.12.5-h30c5eda_0_cpython.conda
@@ -1465,32 +1465,32 @@ packages:
   timestamp: 1711811634025
 - kind: conda
   name: pydantic
-  version: 2.8.2
+  version: 2.9.1
   build: pyhd8ed1ab_0
   subdir: noarch
   noarch: python
-  url: https://conda.anaconda.org/conda-forge/noarch/pydantic-2.8.2-pyhd8ed1ab_0.conda
-  sha256: 5a877153f7eaaab9724db5b64366a35e346007c9c104c1d6a6042f83b2f4f0df
-  md5: 539a038a24a959662df1fcaa2cfc5c3e
+  url: https://conda.anaconda.org/conda-forge/noarch/pydantic-2.9.1-pyhd8ed1ab_0.conda
+  sha256: 9064ec63d676d83452a6a07cb92d95ebfa02b5016841956ce55e324c45e012ee
+  md5: 5309e66d385d7367364e838764ad2ac4
   depends:
-  - annotated-types >=0.4.0
-  - pydantic-core 2.20.1
+  - annotated-types >=0.6.0
+  - pydantic-core 2.23.3
   - python >=3.7
   - typing-extensions >=4.6.1
   license: MIT
   license_family: MIT
   purls:
-  - pkg:pypi/pydantic
-  size: 292538
-  timestamp: 1720293163725
+  - pkg:pypi/pydantic?source=hash-mapping
+  size: 300605
+  timestamp: 1725908662611
 - kind: conda
   name: pydantic-core
-  version: 2.20.1
-  build: py312h552d48e_0
+  version: 2.23.3
+  build: py312he431725_0
   subdir: osx-arm64
-  url: https://conda.anaconda.org/conda-forge/osx-arm64/pydantic-core-2.20.1-py312h552d48e_0.conda
-  sha256: 5a6381ce4a5ecaeffe92f6c05fc4a70290140364e56c715a9de9c939c2bf46de
-  md5: b0b8cd2d2e6aa1620dfea907706f94b4
+  url: https://conda.anaconda.org/conda-forge/osx-arm64/pydantic-core-2.23.3-py312he431725_0.conda
+  sha256: 6d96bf4cb7519bea82cce7480985245727e48fce05026b79c543f02634285355
+  md5: 9bab545219b0f8727c577457a95af3d4
   depends:
   - __osx >=11.0
   - python >=3.12,<3.13.0a0
@@ -1502,9 +1502,9 @@ packages:
   license: MIT
   license_family: MIT
   purls:
-  - pkg:pypi/pydantic-core
-  size: 1426579
-  timestamp: 1720041992028
+  - pkg:pypi/pydantic-core?source=hash-mapping
+  size: 1431635
+  timestamp: 1725736071390
 - kind: conda
   name: pygments
   version: 2.18.0

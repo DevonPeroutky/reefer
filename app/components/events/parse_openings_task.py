@@ -1,5 +1,7 @@
 import fasthtml.svg as svg
 
+from app.agent import AgentState
+from app.agent.knowledge_service import KnowledgeService
 from app.components.events import ActionEvent
 from app.components.primitives.tag import CompanyTag, JobTypeTag, OutputInputTag
 from app.actions import TaskStatus, TaskType
@@ -8,29 +10,42 @@ from app import Company, JobOpening
 from typing import List
 from itertools import groupby as itertools_groupby
 
+from app.services.scraping_service import CareersPageScrapingService, ScrapingService
+from app.services.serp_service import SearchService, SerpService
+
 
 class ParseOpeningsTask(ActionEvent):
     def __init__(
         self,
-        company: Company,
-        job_type: str,
+        knowledge_service: Optional[KnowledgeService] = None,
+        scraping_service: Optional[ScrapingService] = None,
         **kwargs,
     ):
         super().__init__(
             status=TaskStatus.IN_PROGRESS,
             task_type=TaskType.PARSE_OPENINGS,
-            company_name=company.name.title(),
+            knowledge_service=knowledge_service,
             **kwargs,
         )
-        self.company = company
-        self.job_type = job_type
-        self.job_openings = []
+        self.scraping_service = scraping_service or CareersPageScrapingService()
 
-    def complete_task(self, openings: List[JobOpening]):
+    def execute_task(self, state: AgentState):
+        assert (
+            state.company
+        ), "Company must be set in the state before executing this task"
+
+        job_openings = self.scraping_service.parse_openings_from_link(
+            company=state.company,
+            job_type=state.desired_job_type,
+        )
+        state.job_openings = job_openings
+
         super().complete_task()
-        self.job_openings = openings
 
     def _render_title(self):
+        agent_state = self.get_current_state()
+        assert agent_state.company, "Company must be set before rendering the title"
+
         title_cls = "flex gap-x-2 font-medium leading-tight"
         if self.status == TaskStatus.IN_PROGRESS:
             title_cls += " italic"
@@ -39,22 +54,27 @@ class ParseOpeningsTask(ActionEvent):
             Span("Parsing "),
             OutputInputTag(
                 A(
-                    self.company.opening_link,
-                    href=str(self.company.opening_link),
+                    agent_state.company.opening_link,
+                    href=str(agent_state.company.opening_link),
                     target="_blank",
                     cls="font-medium text-sky-500 dark:text-sky-500 hover:underline",
                 )
             ),
             Span("for"),
-            JobTypeTag(self.job_type),
+            JobTypeTag(agent_state.desired_job_type),
             "openings at",
-            CompanyTag(self.company.name.title()),
+            CompanyTag(agent_state.company.name.title()),
             cls=title_cls,
         )
 
     def _render_details(self):
+        agent_state = self.get_current_state()
+        assert agent_state.company, "Company must be set before rendering the details"
+
         sorted_by_location = sorted(
-            self.job_openings or [], key=lambda x: x.location or "Unknown", reverse=True
+            agent_state.job_openings or [],
+            key=lambda x: x.location or "Unknown",
+            reverse=True,
         )
         grouped_by_location = itertools_groupby(
             sorted_by_location,
@@ -71,7 +91,7 @@ class ParseOpeningsTask(ActionEvent):
 
         return (
             Div(
-                f"Found {self.job_type} jobs in the following locations... ",
+                f"Found {agent_state.desired_job_type} jobs in the following locations... ",
                 Form(
                     Div(*openings_by_locations),
                     Div(
@@ -97,12 +117,12 @@ class ParseOpeningsTask(ActionEvent):
                         cls="flex font-medium gap-x-2 mt-8",
                     ),
                     # hx_post=f"/contacts_table?company_name={self.company.name}",
-                    hx_post=f"/research_jobs?company_name={self.company.name}",
+                    hx_post=f"/research_jobs?company_name={agent_state.company.name}",
                     hx_target="#action_plan_timeline",
                     hx_swap="beforeend",
                     hx_ext="chunked-transfer",
                 ),
             )
-            if self.job_openings
+            if agent_state.job_openings
             else None
         )

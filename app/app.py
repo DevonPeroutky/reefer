@@ -10,17 +10,16 @@ from app.components.primitives.modal import (
 )
 from app.components.primitives.search_input import SearchInput
 from app.components.application.timeline import Timeline
-from app.services.action_planner import Agent
 from app.custom_hdrs import CUSTOM_HDRS, FLOWBITE_INCLUDE_SCRIPT
-from app.services.scraping_service import DummyScrapingService
-from app.services.serp_service import DummySearchService
+from app.agent.agent import Agent
+from app.stub.services import DummyScrapingService, DummySearchService
 
 app = FastHTML(hdrs=CUSTOM_HDRS, ct_hdr=True, live=True)
 
-# agent = Agent(
-#     serp_service=DummySearchService(), scraping_service=DummyScrapingService()
-# )
-agent = Agent()
+agent = Agent(
+    serp_service=DummySearchService(), scraping_service=DummyScrapingService()
+)
+# agent = Agent()
 
 
 @app.route("/")
@@ -103,7 +102,7 @@ async def render_contact_table(request: Request, company_name: str):
     form = await request.form()
 
     response = StreamingResponse(
-        agent.find_contacts(agent.desired_job_openings),
+        agent.find_contacts(),
         media_type="text/html",
         headers={"X-Transfer-Encoding": "chunked"},
     )

@@ -6,8 +6,8 @@ from typing import Optional, AsyncGenerator
 from fasthtml.common import Safe, to_xml
 
 from app.actions import BaseAction
-from app.components.events.parse_job_description_event import ParseJobDescriptionEvent
 
+from app.components.events.parse_job_description_event import ParseJobDescriptionTask
 from app.services.scraping_service import ScrapingService
 from app import JobOpening
 
@@ -24,7 +24,7 @@ class ResearchJobAction(BaseAction[JobOpening]):
     async def yield_action_stream(self) -> AsyncGenerator[Safe, None]:
 
         # TODO: Yield a Job Description loading event
-        parse_job_description = ParseJobDescriptionEvent(self.job_opening)
+        parse_job_description = ParseJobDescriptionTask(self.job_opening)
         yield to_xml(parse_job_description)
         await asyncio.sleep(0.1)
 

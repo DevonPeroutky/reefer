@@ -1,14 +1,11 @@
 from abc import ABC, abstractmethod
 import os
-import time
-import random
 import requests
 import json
 
-from fasthtml.common import List, Search
+from fasthtml.common import List
 
 from app import Company, Contact
-from app.stub_data import test_contacts
 
 
 class SearchService(ABC):
@@ -50,8 +47,6 @@ class SerpService(SearchService):
         self, company: Company, keywords: List[str], targetted_roles: List[str]
     ) -> List[Contact]:
 
-        # time.sleep(1)
-        #
         query = "site:linkedin.com/in {} {} {}".format(
             company, " ".join(keywords), " ".join(targetted_roles)
         )
@@ -63,20 +58,3 @@ class SerpService(SearchService):
         # CONVERT SERACH RESULTS TO CONTACTS
 
         return results
-
-
-class DummySearchService(SearchService):
-    def find_careers_url(self, company: str) -> str:
-
-        time_to_sleep = random.randint(1, 2)
-        time.sleep(time_to_sleep)
-
-        return f"https://www.{company}.com/careers"
-
-    def find_list_of_contacts(
-        self, company: Company, keywords: List[str], targetted_roles: List[str]
-    ) -> List[Contact]:
-        time_to_sleep = random.randint(1, 3)
-        time.sleep(time_to_sleep)
-
-        return test_contacts

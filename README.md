@@ -3,6 +3,7 @@
 
 # Milestone 1 - Demo-able 
 - [x] Figure out how to do [modal w/chunked transfer](https://discord.com/channels/689892369998676007/1247700012952191049/1282255144913866823)
+- [ ] REFACTOR?
 - [ ] Test finding contacts E2E
   - [ ] Iterate on the relevant keywords being parsed
   - [x] Update ContactsTableIcon success on complete
@@ -11,8 +12,10 @@
   - [ ] Implement find emails for selected contacts
 
 ## Issues
+- [ ] LinkedIn shares no relevant data with SERP results
 - [ ] Certain companies have custom/unique openings page (once they get big enough)
   - [ ] Snap, Meta, etc, have their own portal
+- [ ] Handle pagination
   - [ ] Anduril, Datadog have a giant paginated list --> Handle pagination
 
 # Milestone 2 - Persistence

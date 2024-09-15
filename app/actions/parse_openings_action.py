@@ -3,10 +3,8 @@ import asyncio
 from typing import Optional, AsyncGenerator, List
 from fasthtml.common import Safe, to_xml
 from app.actions import BaseAction
-from app.stub_data import test_openings
 
 from app.components.events import (
-    ContactTableEvent,
     ParseOpeningsTask,
 )
 from app.services.scraping_service import CareersPageScrapingService, ScrapingService

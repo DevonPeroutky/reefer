@@ -13,6 +13,7 @@ requests = ">=2.32.3,<2.33"
 setuptools = ">=72.1.0,<72.2"
 anthropic = ">=0.34.0,<0.35"
 linkedin-api = ">=2.3.0,<3"
+pydantic = ">=2.9.1,<3"
 
 [pypi-dependencies]
 undetected-chromedriver = "*"

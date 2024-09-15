@@ -1,7 +1,5 @@
 from abc import ABC, abstractmethod
-import random
 import json
-import time
 import os
 from fasthtml.common import dataclass
 import undetected_chromedriver as uc
@@ -18,12 +16,11 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 
 from app import JobOpening, Company
-from app.stub_data import test_openings
 
 PARSE_HTML_SYSTEM_PROMPT = """Your job is to simply return structured data as requested. You parse the full document and return all the results. Provide only the answer, with no additional text or explanation. Do not answer with I Understand or similiar"""
 PARSE_OPENINGS_LINK_PROMPT = """
 This is a JSON list of links parsed from the html content of the {} careers page. This list contains either a list of job openings, or a link to the list of openings/roles/positions/jobs. If the list contains a list of opens or jobs or positions, return None. Otherwise, 
-return the link to the open positions/roles/openings. Do not acknowledge this request, do not return JSON, simply return only either the link or None, with no additional text or explanation: \n\n {}
+return the link to the open positions/roles/openings. Do not acknowledge this request, do not say Understood, simply return only either the link or None, with no additional text or explanation: \n\n {}
 """
 PARSE_OPENINGS_PROMPT = """
 This is the html content of the {} careers page containing a list of list of openings/roles/positions/jobs, each with a link. Parse the page and return a list of openings with the title of the opening, the link to the specific job page, and the location (if available). Also return a boolean field called related.
@@ -236,32 +233,3 @@ class CareersPageScrapingService(ScrapingService):
         json_response = json.loads(text_responses)
         print(json_response)
         return json_response
-
-
-class DummyScrapingService(ScrapingService):
-
-    def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
-        time_to_sleep = random.randint(1, 2)
-        time.sleep(time_to_sleep)
-
-        return f"https://www.{company}.com/careers"
-
-    def find_query_terms_from_job_description(
-        self, job_opening: JobOpening
-    ) -> Dict[str, List[str]]:
-        time_to_sleep = random.randint(1, 2)
-        time.sleep(time_to_sleep)
-        return {
-            "keywords": ["Python", "Django", "React", "GraphQL"],
-            "positions": [
-                "Engineering Manager",
-                "Software Engineering",
-                "Technical Lead",
-            ],
-        }
-
-    def parse_openings_from_link(self, job_type, company: Company) -> List[JobOpening]:
-        time_to_sleep = random.randint(1, 2)
-        time.sleep(time_to_sleep)
-
-        return test_openings

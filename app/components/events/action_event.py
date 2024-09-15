@@ -1,31 +1,47 @@
 from abc import abstractmethod
 from uuid import uuid4
-from typing import Optional
+from typing import Optional, Generic, TypeVar
 from fasthtml.common import *
+from app.agent import AgentState
 
+from app.agent.knowledge_service import KnowledgeService
 from app.components.application.timeline_status_indicator import (
     TimelineEventStatusIndicator,
 )
 from app.actions import TaskStatus, TaskType
 
+T = TypeVar("T")
 
-class ActionEvent:
+
+class ActionEvent(Generic[T]):
     def __init__(
         self,
-        company_name: str,
         status: TaskStatus,
         task_type: TaskType,
+        knowledge_service: Optional[KnowledgeService] = None,
         id: Optional[str] = None,
         **kwargs,
     ):
         self.id = str(id) if id is not None else str(uuid4())
+        self.knowledge_service = knowledge_service or KnowledgeService()
         self.status = status
         self.task_type = task_type
         self.kwargs = kwargs
-        self.company_name = company_name
+
+    def get_current_state(self) -> AgentState:
+        print("Current State: ", self.knowledge_service.get_current_state())
+        return self.knowledge_service.get_current_state()
+
+    @abstractmethod
+    def execute_task(self, state: AgentState):
+        pass
 
     def _prepare_for_dom_update(self):
         self.kwargs["hx_swap_oob"] = "true"
+
+    @abstractmethod
+    def yield_final_result(self) -> T:
+        pass
 
     def complete_task(self, *args, **kwargs):
         self.status = TaskStatus.COMPLETED
