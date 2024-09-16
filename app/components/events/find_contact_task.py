@@ -36,8 +36,6 @@ class FindContactTask(StreamingActionEvent):
             self.job_opening.keywords,
             self.job_opening.positions,
         )
-        print("---------" * 5)
-        print("Found contacts: ", contacts)
 
         self.contacts = contacts
         # Is this thread safe????
@@ -53,8 +51,6 @@ class FindContactTask(StreamingActionEvent):
             self.job_opening.keywords,
             self.job_opening.positions,
         )
-        print("---------" * 5)
-        print("Found contacts: ", contacts)
         for contact_row in list(
             map(lambda c: ContactRow(self.job_opening, c), contacts)
         ):

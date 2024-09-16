@@ -18,7 +18,8 @@ class DummySearchService(SearchService):
     async def find_list_of_contacts(
         self, company: Company, keywords: List[str], targetted_roles: List[str]
     ) -> List[Contact]:
-        await asyncio.sleep(1)
+        time_to_sleep = random.randint(2, 5)
+        await asyncio.sleep(time_to_sleep)
         return test_contacts
 
 
@@ -26,13 +27,15 @@ class DummyScrapingService(ScrapingService):
 
     async def find_openings_page_link(self, company: str, link: str) -> Optional[str]:
 
-        await asyncio.sleep(1)
+        time_to_sleep = random.randint(2, 5)
+        await asyncio.sleep(time_to_sleep)
         return f"https://www.{company}.com/careers"
 
     async def find_query_terms_from_job_description(
         self, job_opening: JobOpening
     ) -> Dict[str, List[str]]:
-        await asyncio.sleep(1)
+        time_to_sleep = random.randint(2, 5)
+        await asyncio.sleep(time_to_sleep)
         return {
             "keywords": ["Python", "Django", "React", "GraphQL"],
             "positions": [
@@ -45,6 +48,7 @@ class DummyScrapingService(ScrapingService):
     async def parse_openings_from_link(
         self, job_type, company: Company
     ) -> List[JobOpening]:
-        await asyncio.sleep(1)
+        time_to_sleep = random.randint(2, 5)
+        await asyncio.sleep(time_to_sleep)
 
         return test_openings

@@ -1,6 +1,6 @@
 import asyncio
 
-from typing import List, Optional, AsyncGenerator, Any
+from typing import List, Optional, AsyncGenerator, Any, TypeVar
 from fasthtml.common import Safe, to_xml
 
 from app import agent
@@ -45,6 +45,8 @@ Finding contacts for a company is essentially a multi-step process of...
 
 """
 
+ActionEventType = TypeVar("ActionEventType", bound=ActionEvent)
+
 
 class Agent:
     def __init__(
@@ -76,19 +78,25 @@ class Agent:
             yield to_xml(r)
             await asyncio.sleep(0.0)
 
-    async def execute_tasks_sequentially(self, tasks: List[ActionEvent]):
+    async def execute_tasks_sequentially(self, tasks: List[ActionEventType]):
+        """
+        Execute tasks sequentially, waiting for one task to fully complete before moving to the next
+        """
         for task in tasks:
             async for res in self.execute_task(task):
                 yield res
-                await asyncio.sleep(0.0)
 
-    async def execute_tasks_in_parallel(self, tasks: List[ActionEvent]):
+    async def execute_tasks_in_parallel(self, tasks: List[ActionEventType]):
+        """
+        Execute tasks concurrently and yield results as they complete
+        """
         async for res in combine_generators(
             *[self.execute_task(task) for task in tasks]
         ):
             yield res
             await asyncio.sleep(0.0)
 
+    # ----------------- Agent Actions ----------------- #
     async def find_company_information(self, company_name: str):
 
         # Initialize the company
@@ -113,10 +121,8 @@ class Agent:
             ),
         ]
 
-        # Execute tasks sequentially
-        for task in tasks:
-            async for res in self.execute_task(task):
-                yield res
+        async for task in self.execute_tasks_sequentially(tasks):
+            yield task
 
     async def research_job_openings(self, job_ids: List[str]):
         agent_state = self.knowledge_service.get_current_state()
@@ -127,7 +133,7 @@ class Agent:
             filter(lambda job: job.id in job_ids, agent_state.job_openings)
         )
 
-        research_job_tasks = [
+        tasks = [
             ParseJobDescriptionTask(
                 job=job,
                 scraping_service=self.scraping_service,
@@ -136,30 +142,13 @@ class Agent:
             for job in agent_state.desired_job_openings
         ]
 
-        # Execute tasks concurrently and yield results as they complete
-        async for res in combine_generators(
-            *[self.execute_task(task) for task in research_job_tasks]
-        ):
-            yield res
-            await asyncio.sleep(0)
+        async for task in self.execute_tasks_in_parallel(tasks):
+            yield task
 
         contact_table = ContactTableEvent(
             id="contact-table", company=agent_state.company, job_contacts=[]
         )
         yield to_xml(contact_table)
-
-    # TODO: Move to a separate task
-    async def find_contacts_for_opening(
-        self, job_opening: JobOpening
-    ) -> AsyncGenerator[str, None]:
-        contacts: List[Contact] = await self.serp_service.find_list_of_contacts(
-            job_opening.company, job_opening.keywords, job_opening.positions
-        )
-        print("---------" * 5)
-        print("Found contacts: ", contacts)
-        for contact_row in list(map(lambda c: ContactRow(job_opening, c), contacts)):
-            yield to_xml(contact_row)
-            await asyncio.sleep(1)
 
     async def find_contacts(self):
         agent_state = self.knowledge_service.get_current_state()
