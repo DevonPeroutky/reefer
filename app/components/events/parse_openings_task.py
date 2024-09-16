@@ -4,7 +4,7 @@ from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
 from app.components.events import ActionEvent
 from app.components.primitives.tag import CompanyTag, JobTypeTag, OutputInputTag
-from app.actions import TaskStatus, TaskType
+from app import TaskStatus, TaskType
 from fasthtml.common import *
 from app import Company, JobOpening
 from typing import List

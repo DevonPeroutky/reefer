@@ -8,7 +8,7 @@ from app.components.primitives.tag import (
     KeywordTag,
     PositionTag,
 )
-from app.actions import TaskStatus, TaskType
+from app import TaskStatus, TaskType
 from fasthtml.common import *
 from app import JobOpening
 from typing import List

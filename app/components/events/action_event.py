@@ -8,7 +8,7 @@ from app.agent.knowledge_service import KnowledgeService
 from app.components.application.timeline_status_indicator import (
     TimelineEventStatusIndicator,
 )
-from app.actions import TaskStatus, TaskType
+from app import TaskStatus, TaskType
 
 T = TypeVar("T")
 

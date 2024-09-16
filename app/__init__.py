@@ -1,7 +1,10 @@
+from enum import Enum
 from uuid import uuid4
 from dataclasses import dataclass, field
-from typing import List, Optional
+from typing import List, Optional, TypeVar
 from fasthtml.common import Div, Input, Label, A, P
+
+T = TypeVar("T")
 
 
 @dataclass
@@ -63,3 +66,18 @@ class Contact:
     job_title: Optional[str] = None
     location: Optional[str] = None
     id: str = field(default_factory=lambda: str(uuid4()))
+
+
+class TaskStatus(Enum):
+    PENDING = "PENDING"
+    IN_PROGRESS = "IN_PROGRESS"
+    COMPLETED = "COMPLETED"
+    FAILED = "FAILED"
+
+
+class TaskType(Enum):
+    FIND_CAREERS_PAGE = "find_careers_page"
+    FIND_OPENINGS_PAGE = "find_openings_page"
+    PARSE_OPENINGS = "parse_openings"
+    FIND_CONTACTS = "find_contacts"
+    PARSE_JOB_DESCRIPTION = "parse_job_description"

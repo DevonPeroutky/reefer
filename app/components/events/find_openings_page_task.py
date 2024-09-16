@@ -3,7 +3,7 @@ from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
 from app.components.events import ActionEvent
 from app.components.primitives.tag import CompanyTag, OutputInputTag
-from app.actions import TaskStatus, TaskType
+from app import TaskStatus, TaskType
 from app.services.scraping_service import ScrapingService, CareersPageScrapingService
 from fasthtml.common import *
 from typing import Optional

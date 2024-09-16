@@ -1,12 +1,8 @@
 from abc import abstractmethod
 from uuid import uuid4
-from typing import Optional
+from typing import Optional, TypeVar
 from fasthtml.common import *
-
-from app.components.application.timeline_status_indicator import (
-    TimelineEventStatusIndicator,
-)
-from app.actions import TaskStatus, TaskType
+from enum import Enum
 
 from .action_event import ActionEvent
 from .contact_table_event import ContactTableEvent

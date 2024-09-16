@@ -5,7 +5,7 @@ from app.services.serp_service import SearchService, SerpService
 from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
 from app.components.primitives.tag import CompanyTag
-from app.actions import TaskStatus, TaskType
+from app import TaskStatus, TaskType
 from fasthtml.common import *
 from app import Company, JobOpening, Contact
 from app.components.application.contact_table import ContactRow

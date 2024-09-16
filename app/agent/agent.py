@@ -10,16 +10,10 @@ from app.components.events import FindCareersPageTask, ParseJobDescriptionTask
 from app.components.events.find_contact_task import FindContactTask
 from app.components.events.find_openings_page_task import FindOpeningsPageTask
 from app.components.events.parse_openings_task import ParseOpeningsTask
-from app.stub.data import spotter_openings, spotter
-from app.agent import AgentState
 from app.components.events.action_event import ActionEvent, StreamingActionEvent
 from app.components.events.contact_table_event import ContactTableEvent
 from app.components.primitives.success_icon import SuccessIcon
-from app.actions.find_company_action import FindCompanyAction
-from app.actions.parse_openings_action import ParseOpeningsAction
-from app.actions.find_contacts_action import FindContactsAction
 from app import Company, Contact, JobOpening
-from app.actions.research_job_action import ResearchJobAction
 from app.services.serp_service import SearchService, SerpService
 from app.services.scraping_service import CareersPageScrapingService, ScrapingService
 from app.utils.asyncio import combine_generators
@@ -29,8 +23,6 @@ from app.utils.asyncio import combine_generators
 Finding contacts for a company is essentially a multi-step process of...
 
 /find_company_information -> /parse_openings -> /research_job_openings -> /find_contacts
-
-
 
 
 1. /find_company_information
