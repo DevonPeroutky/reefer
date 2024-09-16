@@ -80,3 +80,21 @@ class StreamingActionEvent(ActionEvent):
     @abstractmethod
     def execute_streaming_task(self, *args, **kwargs) -> AsyncGenerator[str, None]:
         pass
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
+
+
+@dataclass
+class ActionEvent:
+    """
+    Represents an action event in the system.
+
+    Attributes:
+        action (str): The type of action.
+        data (Dict[str, Any]): Additional data associated with the action.
+        source (Optional[str]): The source of the action event.
+    """
+
+    action: str
+    data: Dict[str, Any]
+    source: Optional[str] = None
