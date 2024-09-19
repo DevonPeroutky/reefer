@@ -2,6 +2,8 @@ import time
 from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
 from app.components.events import ActionEvent
+from app.components.events.action_event import TimelineActionEvent
+from app.components.events.action_event import TimelineActionEvent
 from app.components.primitives.tag import (
     CompanyTag,
     JobTypeTag,
@@ -16,7 +18,7 @@ from typing import List
 from app.services.scraping_service import CareersPageScrapingService, ScrapingService
 
 
-class ParseJobDescriptionTask(ActionEvent):
+class ParseJobDescriptionTask(TimelineActionEvent):
     def __init__(
         self,
         job: JobOpening,

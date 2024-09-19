@@ -2,7 +2,7 @@ import fasthtml.svg as svg
 
 from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
-from app.components.events import ActionEvent
+from app.components.events import ActionEvent, TimelineActionEvent
 from app.components.primitives.tag import CompanyTag, JobTypeTag, OutputInputTag
 from app import TaskStatus, TaskType
 from fasthtml.common import *
@@ -14,7 +14,7 @@ from app.services.scraping_service import CareersPageScrapingService, ScrapingSe
 from app.services.serp_service import SearchService, SerpService
 
 
-class ParseOpeningsTask(ActionEvent):
+class ParseOpeningsTask(TimelineActionEvent):
     def __init__(
         self,
         knowledge_service: Optional[KnowledgeService] = None,

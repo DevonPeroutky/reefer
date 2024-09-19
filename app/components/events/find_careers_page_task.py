@@ -2,6 +2,8 @@ from app import Company
 from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
 from app.components.events import ActionEvent
+from app.components.events.action_event import TimelineActionEvent
+from app.components.events.action_event import TimelineActionEvent
 from app.components.primitives.tag import CompanyTag
 from app import TaskStatus, TaskType
 from fasthtml.common import *
@@ -9,7 +11,7 @@ from fasthtml.common import *
 from app.services.serp_service import SearchService, SerpService
 
 
-class FindCareersPageTask(ActionEvent[str]):
+class FindCareersPageTask(TimelineActionEvent):
     def __init__(
         self,
         knowledge_service: Optional[KnowledgeService] = None,

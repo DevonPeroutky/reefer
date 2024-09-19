@@ -5,6 +5,7 @@ from fasthtml.common import *
 from enum import Enum
 
 from .action_event import ActionEvent
+from .action_event import TimelineActionEvent
 from .contact_table_event import ContactTableEvent
 from .parse_job_description_event import ParseJobDescriptionTask
 from .parse_openings_task import ParseOpeningsTask

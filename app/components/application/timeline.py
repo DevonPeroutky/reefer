@@ -1,9 +1,9 @@
 from typing import List, TypeVar
 from fasthtml.common import Div, Ol
-from app.components.events.action_event import ActionEvent
+from app.components.events.action_event import TimelineActionEvent
 
 
-T = TypeVar("T", bound="ActionEvent")
+T = TypeVar("T", bound="TimelineActionEvent")
 
 
 class Timeline:

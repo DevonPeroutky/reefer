@@ -2,6 +2,7 @@ from app import Company
 from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
 from app.components.events import ActionEvent
+from app.components.events.action_event import TimelineActionEvent
 from app.components.primitives.tag import CompanyTag, OutputInputTag
 from app import TaskStatus, TaskType
 from app.services.scraping_service import ScrapingService, CareersPageScrapingService
@@ -9,7 +10,7 @@ from fasthtml.common import *
 from typing import Optional
 
 
-class FindOpeningsPageTask(ActionEvent[Company]):
+class FindOpeningsPageTask(TimelineActionEvent):
     def __init__(
         self,
         knowledge_service: Optional[KnowledgeService] = None,

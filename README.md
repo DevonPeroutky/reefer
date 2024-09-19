@@ -22,17 +22,15 @@ Built using [fastht.ml](https://fastht.ml/). The general principles revolves aro
 # TO-DO
 
 # Milestone 1 - Demo-able 
-- [x] Figure out how to do [modal w/chunked transfer](https://discord.com/channels/689892369998676007/1247700012952191049/1282255144913866823)
-- [ ] REFACTOR?
 - [ ] Test finding contacts E2E
   - [ ] Iterate on the relevant keywords being parsed
-  - [x] Update ContactsTableIcon success on complete
 - [ ] Generate outreach
   - [ ] Skeleton out action dropdown w/checklist items
   - [ ] Implement find emails for selected contacts
 
 ## Issues
 - [ ] LinkedIn shares no relevant data with SERP results
+  - [ ] Use something like https://www.peopledatalabs.com/pricing/person?
 - [ ] Certain companies have custom/unique openings page (once they get big enough)
   - [ ] Snap, Meta, etc, have their own portal
 - [ ] Handle pagination

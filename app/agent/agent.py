@@ -10,7 +10,11 @@ from app.components.events import FindCareersPageTask, ParseJobDescriptionTask
 from app.components.events.find_contact_task import FindContactTask
 from app.components.events.find_openings_page_task import FindOpeningsPageTask
 from app.components.events.parse_openings_task import ParseOpeningsTask
-from app.components.events.action_event import ActionEvent, StreamingActionEvent
+from app.components.events.action_event import (
+    ActionEvent,
+    StreamingActionEvent,
+    TimelineActionEvent,
+)
 from app.components.events.contact_table_event import ContactTableEvent
 from app.components.primitives.success_icon import SuccessIcon
 from app import Company, Contact, JobOpening
@@ -59,7 +63,9 @@ class Agent:
         self.knowledge_service = KnowledgeService()
         self.render_queue = asyncio.Queue()
 
-    async def execute_task(self, task: ActionEvent) -> AsyncGenerator[Safe, None]:
+    async def execute_timeline_task(
+        self, task: TimelineActionEvent
+    ) -> AsyncGenerator[Safe, None]:
         # Send Pending Event to client immediately
         yield to_xml(task)
         await asyncio.sleep(0.0)
@@ -83,7 +89,7 @@ class Agent:
         Execute tasks sequentially, waiting for one task to fully complete before moving to the next
         """
         for task in tasks:
-            async for res in self.execute_task(task):
+            async for res in self.execute_timeline_task(task):
                 yield res
 
     async def execute_tasks_in_parallel(self, tasks: List[ActionEventType]):
@@ -91,7 +97,7 @@ class Agent:
         Execute tasks concurrently and yield results as they complete
         """
         async for res in combine_generators(
-            *[self.execute_task(task) for task in tasks]
+            *[self.execute_timeline_task(task) for task in tasks]
         ):
             yield res
             await asyncio.sleep(0.0)
