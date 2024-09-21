@@ -50,6 +50,10 @@ Finding contacts for a company is essentially a multi-step process of...
 """
 
 ActionEventType = TypeVar("ActionEventType", bound=ActionEvent)
+TimelineActionEventType = TypeVar("TimelineActionEventType", bound=TimelineActionEvent)
+StreamingActionEventType = TypeVar(
+    "StreamingActionEventType", bound=StreamingActionEvent
+)
 
 
 class Agent:
@@ -77,14 +81,16 @@ class Agent:
         yield to_xml(task)
         await asyncio.sleep(0.0)
 
-    async def execute_streaming_task(self, task: StreamingActionEvent):
+    async def execute_streaming_task(
+        self, task: StreamingActionEvent
+    ) -> AsyncGenerator[Safe, None]:
         res = task.execute_streaming_task(self.knowledge_service.get_current_state())
 
         async for r in res:
             yield to_xml(r)
             await asyncio.sleep(0.0)
 
-    async def execute_tasks_sequentially(self, tasks: List[ActionEventType]):
+    async def execute_tasks_sequentially(self, tasks: List[TimelineActionEventType]):
         """
         Execute tasks sequentially, waiting for one task to fully complete before moving to the next
         """
@@ -92,7 +98,7 @@ class Agent:
             async for res in self.execute_timeline_task(task):
                 yield res
 
-    async def execute_tasks_in_parallel(self, tasks: List[ActionEventType]):
+    async def execute_tasks_in_parallel(self, tasks: List[TimelineActionEventType]):
         """
         Execute tasks concurrently and yield results as they complete
         """
