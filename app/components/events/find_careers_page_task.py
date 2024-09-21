@@ -26,7 +26,7 @@ class FindCareersPageTask(TimelineActionEvent):
         )
         self.serp_service: SearchService = serp_service or SerpService()
 
-    async def execute_task(self, state: AgentState):
+    async def execute_timeline_task(self, state: AgentState):
         assert (
             state.company
         ), "Company must be set in the state before executing this task"

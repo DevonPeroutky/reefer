@@ -29,7 +29,7 @@ class ParseOpeningsTask(TimelineActionEvent):
         )
         self.scraping_service = scraping_service or CareersPageScrapingService()
 
-    async def execute_task(self, state: AgentState):
+    async def execute_timeline_task(self, state: AgentState):
         assert (
             state.company
         ), "Company must be set in the state before executing this task"

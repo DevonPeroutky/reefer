@@ -67,35 +67,19 @@ class Agent:
         self.knowledge_service = KnowledgeService()
         self.render_queue = asyncio.Queue()
 
-    async def execute_timeline_task(
-        self, task: TimelineActionEvent
-    ) -> AsyncGenerator[Safe, None]:
-        # Send Pending Event to client immediately
-        yield to_xml(task)
-        await asyncio.sleep(0.0)
-
-        # Execute Task
-        await task.execute_task(self.knowledge_service.get_current_state())
-
-        # Re-render completed event to client
-        yield to_xml(task)
-        await asyncio.sleep(0.0)
-
     async def execute_tasks_sequentially(self, tasks: List[TimelineActionEventType]):
         """
         Execute tasks sequentially, waiting for one task to fully complete before moving to the next
         """
         for task in tasks:
-            async for res in self.execute_timeline_task(task):
+            async for res in task.execute_task():
                 yield res
 
     async def execute_tasks_in_parallel(self, tasks: List[TimelineActionEventType]):
         """
         Execute tasks concurrently and yield results as they complete
         """
-        async for res in combine_generators(
-            *[self.execute_timeline_task(task) for task in tasks]
-        ):
+        async for res in combine_generators(*[task.execute_task() for task in tasks]):
             yield res
             await asyncio.sleep(0.0)
 

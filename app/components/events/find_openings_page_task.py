@@ -27,7 +27,7 @@ class FindOpeningsPageTask(TimelineActionEvent):
             scraping_service or CareersPageScrapingService()
         )
 
-    async def execute_task(self, state: AgentState):
+    async def execute_timeline_task(self, state: AgentState):
         assert (
             state and state.company and state.company.careers_link
         ), "Company must be set in the state before executing this task"

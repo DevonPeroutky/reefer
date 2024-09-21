@@ -1,3 +1,4 @@
+import asyncio
 from abc import abstractmethod
 from uuid import uuid4
 from typing import AsyncGenerator, Optional, Generic, TypeVar
@@ -31,10 +32,6 @@ class ActionEvent(Generic[T]):
     def get_current_state(self) -> AgentState:
         print("Current State: ", self.knowledge_service.get_current_state())
         return self.knowledge_service.get_current_state()
-
-    @abstractmethod
-    async def execute_task(self, state: AgentState):
-        pass
 
     def _prepare_for_dom_update(self):
         self.kwargs["hx_swap_oob"] = "true"
@@ -108,6 +105,22 @@ class TimelineActionEvent(ActionEvent):
             id=f"item-{self.id}",
             **self.kwargs,
         )
+
+    async def execute_task(self) -> AsyncGenerator[Safe, None]:
+        # Send Pending Event to client immediately
+        yield to_xml(self)
+        await asyncio.sleep(0.0)
+
+        # Execute Task
+        await self.execute_timeline_task(self.knowledge_service.get_current_state())
+
+        # Re-render completed event to client
+        yield to_xml(self)
+        await asyncio.sleep(0.0)
+
+    @abstractmethod
+    async def execute_timeline_task(self, state: AgentState):
+        pass
 
 
 class StreamingActionEvent(ActionEvent):

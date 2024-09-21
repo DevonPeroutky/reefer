@@ -37,7 +37,7 @@ class ParseJobDescriptionTask(TimelineActionEvent):
         )
         self.job = job
 
-    async def execute_task(self, state: AgentState):
+    async def execute_timeline_task(self, state: AgentState):
         print(
             f"Searching for query terms for ",
             (self.job),
