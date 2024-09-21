@@ -45,7 +45,7 @@ class FindContactTask(StreamingActionEvent):
 
     async def execute_streaming_task(
         self, state: AgentState
-    ) -> AsyncGenerator[str, None]:
+    ) -> AsyncGenerator[Safe, None]:
         contacts: List[Contact] = await self.serp_service.find_list_of_contacts(
             self.job_opening.company,
             self.job_opening.keywords,

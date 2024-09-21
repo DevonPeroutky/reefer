@@ -81,15 +81,6 @@ class Agent:
         yield to_xml(task)
         await asyncio.sleep(0.0)
 
-    async def execute_streaming_task(
-        self, task: StreamingActionEvent
-    ) -> AsyncGenerator[Safe, None]:
-        res = task.execute_streaming_task(self.knowledge_service.get_current_state())
-
-        async for r in res:
-            yield to_xml(r)
-            await asyncio.sleep(0.0)
-
     async def execute_tasks_sequentially(self, tasks: List[TimelineActionEventType]):
         """
         Execute tasks sequentially, waiting for one task to fully complete before moving to the next
@@ -113,6 +104,8 @@ class Agent:
 
         # Initialize the company
         current_state = self.knowledge_service.get_current_state()
+
+        # TODO: This should be a separate task
         current_state.company = Company(
             name=company_name, careers_link=None, opening_link=None
         )
@@ -157,6 +150,7 @@ class Agent:
         async for task in self.execute_tasks_in_parallel(tasks):
             yield task
 
+        # Render the contact table which triggers the find_contacts task
         contact_table = ContactTableEvent(
             id="contact-table", company=agent_state.company, job_contacts=[]
         )
@@ -177,7 +171,10 @@ class Agent:
             for job in agent_state.desired_job_openings
         ]
         async for res in combine_generators(
-            *[self.execute_streaming_task(task) for task in tasks]
+            *[
+                task.execute_streaming_task(self.knowledge_service.get_current_state())
+                for task in tasks
+            ]
         ):
             yield to_xml(res)
             await asyncio.sleep(0.0)
