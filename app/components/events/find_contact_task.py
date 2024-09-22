@@ -30,22 +30,11 @@ class FindContactTask(StreamingActionEvent):
         self.contacts: List[Contact] = []
         self.serp_service: SearchService = serp_service or SerpService()
 
-    async def execute_task(self, state: AgentState):
-        contacts: List[Contact] = await self.serp_service.find_list_of_contacts(
-            self.job_opening.company,
-            self.job_opening.keywords,
-            self.job_opening.positions,
-        )
-
-        self.contacts = contacts
-        # Is this thread safe????
-        state.contacts.extend(contacts)
-
-        super().complete_task()
-
     async def execute_streaming_task(
         self, state: AgentState
     ) -> AsyncGenerator[Safe, None]:
+
+        # TODO: Replace this with some better way to find contacts
         contacts: List[Contact] = await self.serp_service.find_list_of_contacts(
             self.job_opening.company,
             self.job_opening.keywords,
@@ -55,7 +44,7 @@ class FindContactTask(StreamingActionEvent):
             map(lambda c: ContactRow(self.job_opening, c), contacts)
         ):
             yield to_xml(contact_row)
-            await asyncio.sleep(1)
+            await asyncio.sleep(0)
 
     def __ft__(self):
         contact_rows = [

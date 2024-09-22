@@ -35,7 +35,6 @@ class FindCareersPageTask(TimelineActionEvent):
 
         # Update the company state with the careers page link
         state.company.careers_link = careers_page_url
-        super().complete_task()
 
     def _render_title(self):
         agent_state = self.get_current_state()

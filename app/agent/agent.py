@@ -6,18 +6,18 @@ from fasthtml.common import Safe, to_xml
 from app import agent
 from app.agent.knowledge_service import KnowledgeService
 from app.components.application.contact_table import ContactRow
-from app.components.events import FindCareersPageTask, ParseJobDescriptionTask
+from app.components.events import (
+    FindCareersPageTask,
+    ParseJobDescriptionTask,
+    StreamingActionEventType,
+    TimelineActionEventType,
+)
 from app.components.events.find_contact_task import FindContactTask
 from app.components.events.find_openings_page_task import FindOpeningsPageTask
 from app.components.events.parse_openings_task import ParseOpeningsTask
-from app.components.events.action_event import (
-    ActionEvent,
-    StreamingActionEvent,
-    TimelineActionEvent,
-)
 from app.components.events.contact_table_event import ContactTableEvent
 from app.components.primitives.success_icon import SuccessIcon
-from app import Company, Contact, JobOpening
+from app import Company
 from app.services.serp_service import SearchService, SerpService
 from app.services.scraping_service import CareersPageScrapingService, ScrapingService
 from app.utils.asyncio import combine_generators
@@ -48,12 +48,6 @@ Finding contacts for a company is essentially a multi-step process of...
     b. Use getprospect API to find emails for each linkedin profile
 
 """
-
-ActionEventType = TypeVar("ActionEventType", bound=ActionEvent)
-TimelineActionEventType = TypeVar("TimelineActionEventType", bound=TimelineActionEvent)
-StreamingActionEventType = TypeVar(
-    "StreamingActionEventType", bound=StreamingActionEvent
-)
 
 
 class Agent:

@@ -4,10 +4,16 @@ from typing import Optional, TypeVar
 from fasthtml.common import *
 from enum import Enum
 
-from .action_event import ActionEvent
-from .action_event import TimelineActionEvent
+from .action_event import ActionEvent, StreamingActionEvent, TimelineActionEvent
 from .contact_table_event import ContactTableEvent
 from .parse_job_description_event import ParseJobDescriptionTask
 from .parse_openings_task import ParseOpeningsTask
 from .find_careers_page_task import FindCareersPageTask
 from .find_openings_page_task import FindOpeningsPageTask
+
+
+ActionEventType = TypeVar("ActionEventType", bound=ActionEvent)
+TimelineActionEventType = TypeVar("TimelineActionEventType", bound=TimelineActionEvent)
+StreamingActionEventType = TypeVar(
+    "StreamingActionEventType", bound=StreamingActionEvent
+)

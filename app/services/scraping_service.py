@@ -118,7 +118,7 @@ class ScrapingService(ABC):
         chrome_options.add_argument("--no-sandbox")
         chrome_options.add_argument("--disable-dev-shm-usage")
 
-        driver = uc.Chrome(options=chrome_options)
+        driver = uc.Chrome(options=chrome_options, version_main=128)
         driver.get(url)
 
         # Wait for JavaScript to finish loading

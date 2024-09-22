@@ -2,16 +2,13 @@ import fasthtml.svg as svg
 
 from app.agent import AgentState
 from app.agent.knowledge_service import KnowledgeService
-from app.components.events import ActionEvent, TimelineActionEvent
+from app.components.events import TimelineActionEvent
 from app.components.primitives.tag import CompanyTag, JobTypeTag, OutputInputTag
 from app import TaskStatus, TaskType
 from fasthtml.common import *
-from app import Company, JobOpening
-from typing import List
 from itertools import groupby as itertools_groupby
 
 from app.services.scraping_service import CareersPageScrapingService, ScrapingService
-from app.services.serp_service import SearchService, SerpService
 
 
 class ParseOpeningsTask(TimelineActionEvent):
@@ -39,8 +36,6 @@ class ParseOpeningsTask(TimelineActionEvent):
             job_type=state.desired_job_type,
         )
         state.job_openings = job_openings
-
-        super().complete_task()
 
     def _render_title(self):
         agent_state = self.get_current_state()

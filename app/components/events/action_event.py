@@ -113,6 +113,7 @@ class TimelineActionEvent(ActionEvent):
 
         # Execute Task
         await self.execute_timeline_task(self.knowledge_service.get_current_state())
+        self.complete_task()
 
         # Re-render completed event to client
         yield to_xml(self)

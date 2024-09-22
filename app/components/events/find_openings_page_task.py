@@ -40,8 +40,6 @@ class FindOpeningsPageTask(TimelineActionEvent):
         )
         state.company.opening_link = openings_page_url
 
-        super().complete_task()
-
     def _render_title(self):
         company = self.get_current_state().company
         assert (

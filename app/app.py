@@ -11,14 +11,21 @@ from app.components.primitives.search_input import SearchInput
 from app.components.application.timeline import Timeline
 from app.custom_hdrs import CUSTOM_HDRS, FLOWBITE_INCLUDE_SCRIPT
 from app.agent.agent import Agent
+from app.services.serp_service import (
+    DummySearchClient,
+    ExaClient,
+    SearchService,
+    SerpDogClient,
+    SerpService,
+)
 from app.stub.services import DummyScrapingService, DummySearchService
 
 app = FastHTML(hdrs=CUSTOM_HDRS, ct_hdr=True, live=True)
 
-agent = Agent(
-    serp_service=DummySearchService(), scraping_service=DummyScrapingService()
-)
-# agent = Agent()
+# search_service = SerpService(search_client=DummySearchClient())
+# agent = Agent(serp_service=search_service, scraping_service=DummyScrapingService())
+serp_service = SerpService(search_client=SerpDogClient())
+agent = Agent(serp_service=serp_service)
 
 
 @app.route("/")

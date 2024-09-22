@@ -52,7 +52,6 @@ class ParseJobDescriptionTask(TimelineActionEvent):
         self.job.positions = positions
 
         self.knowledge_service.upsert_job_opening(job_opening=self.job)
-        super().complete_task()
 
     def _render_title(self):
         title_cls = "flex gap-x-2 font-medium leading-tight"

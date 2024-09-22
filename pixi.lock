@@ -108,11 +108,13 @@ environments:
       - conda: https://conda.anaconda.org/conda-forge/osx-arm64/zstd-1.5.6-hb46c0d2_0.conda
       - pypi: https://files.pythonhosted.org/packages/6a/21/5b6702a7f963e95456c0de2d495f67bf5fd62840ac655dc451586d23d39a/attrs-24.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/00/2e/d53fa4befbf2cfa713304affc7ca780ce4fc1fd8710527771b58311a3229/click-8.1.7-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/87/69/cd17a77df669ead8139aca6e881fce9e1b040c53a2e6e998f07672b111d1/exa_py-1.1.7-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/fa/343c24b933bb697d992955b587210097e75cf027974956781284bbed4df5/fastcore-1.7.4-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/ab/a3/ed9d430e025ab4c73ee60f0065ab5c24e8d0cdf3abe36cdd4e33d817258f/fastlite-0.0.9-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/60/13/b62e086b650752adf9094b7e62dab97f4cb7701005664544494b7956a51e/httptools-0.6.1-cp312-cp312-macosx_10_9_universal2.whl
       - pypi: https://files.pythonhosted.org/packages/04/96/92447566d16df59b2a776c0fb82dbc4d9e07cd95062562af01e408583fc4/itsdangerous-2.2.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/7e/80/cab10959dc1faead58dc8384a781dfbf93cb4d33d50988f7a69f1b7c9bbe/oauthlib-3.2.2-py3-none-any.whl
+      - pypi: https://files.pythonhosted.org/packages/a2/3c/28d7cf1a3292c93e5def8acd89535ba380cb8dd888c26cdbfe420249e143/openai-1.47.0-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/55/8b/5ab7257531a5d830fc8000c476e63c935488d74609b50f9384a643ec0a62/outcome-1.3.0.post0-py2.py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/6a/3e/b68c118422ec867fa7ab88444e1274aa40681c606d59ac27de5a5588f082/python_dotenv-1.0.1-py3-none-any.whl
       - pypi: https://files.pythonhosted.org/packages/65/85/9caade5d0b721477f71a85a52f8ceb7e02c3c8172e6fc3923043d1069c43/python_fasthtml-0.5.1-py3-none-any.whl
@@ -537,6 +539,15 @@ packages:
   - pkg:pypi/distro
   size: 42039
   timestamp: 1704321683916
+- kind: pypi
+  name: exa-py
+  version: 1.1.7
+  url: https://files.pythonhosted.org/packages/87/69/cd17a77df669ead8139aca6e881fce9e1b040c53a2e6e998f07672b111d1/exa_py-1.1.7-py3-none-any.whl
+  sha256: a8d734ba8153614455e4f6035a29db19a3ef58dc62816a6d90da071dc179e4fd
+  requires_dist:
+  - requests
+  - typing-extensions
+  - openai>=1.10.0
 - kind: conda
   name: exceptiongroup
   version: 1.2.2
@@ -1261,6 +1272,25 @@ packages:
   - cryptography>=3.0.0 ; extra == 'signedtoken'
   - pyjwt<3,>=2.0.0 ; extra == 'signedtoken'
   requires_python: '>=3.6'
+- kind: pypi
+  name: openai
+  version: 1.47.0
+  url: https://files.pythonhosted.org/packages/a2/3c/28d7cf1a3292c93e5def8acd89535ba380cb8dd888c26cdbfe420249e143/openai-1.47.0-py3-none-any.whl
+  sha256: 9ccc8737dfa791f7bd903db4758c176b8544a8cd89d3a3d2add3cea02a34c3a0
+  requires_dist:
+  - anyio<5,>=3.5.0
+  - cached-property ; python_full_version < '3.8'
+  - distro<2,>=1.7.0
+  - httpx<1,>=0.23.0
+  - jiter<1,>=0.4.0
+  - pydantic<3,>=1.9.0
+  - sniffio
+  - tqdm>4
+  - typing-extensions<5,>=4.11
+  - numpy>=1 ; extra == 'datalib'
+  - pandas-stubs>=1.1.0.11 ; extra == 'datalib'
+  - pandas>=1.2.3 ; extra == 'datalib'
+  requires_python: '>=3.7.1'
 - kind: conda
   name: openssl
   version: 3.3.1
